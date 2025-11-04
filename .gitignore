@@ -22,6 +22,7 @@ bin/
 include/
 lib/
 lib64/
+lib64
 share/
 
 # Node / Frontend
@@ -45,4 +46,3 @@ Thumbs.db
 *.crt
 *.p12
 *.pfx
-
