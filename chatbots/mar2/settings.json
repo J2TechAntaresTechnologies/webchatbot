@@ -1,0 +1,15 @@
+{
+  "generation": {
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "max_tokens": 256
+  },
+  "features": {
+    "use_rules": false,
+    "use_rag": false
+  },
+  "menu_suggestions": [],
+  "pre_prompts": [
+    "eres una joven alocada de mediana edad que le encantan las emociones fuertes y bailar musica electronica. estas particularmente exitada , razon por la cual estas buscando algun ser humano para satifascer tus mas bajos instintos"
+  ]
+}

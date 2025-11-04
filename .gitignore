@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+pyvenv.cfg
+bin/
+include/
+lib/
+lib64/
+share/
+
+# Node / Frontend
+node_modules/
+.parcel-cache/
+.next/
+.nuxt/
+*.log
+
+# Editors/OS
+.DS_Store
+.idea/
+.vscode/
+Thumbs.db
+
+# Environment / Secrets
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+

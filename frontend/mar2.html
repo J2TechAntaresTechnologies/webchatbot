@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MAR2</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="chat-container" aria-label="MAR2 chat">
+      <h1>MAR2</h1>
+      <section id="chat-log" class="chat-log" aria-live="polite"></section>
+      <div id="config-summary" class="config-summary" aria-live="polite"></div>
+      <form id="chat-form" class="chat-form" aria-label="Enviar mensaje">
+        <div class="input-group">
+          <input id="message" name="message" autocomplete="off" placeholder="Escribí un mensaje..." />
+          <button type="submit">Enviar</button>
+        </div>
+      </form>
+    </main>
+    <button id="exit-btn" type="button" class="fab-exit" aria-label="Salir al portal">Salir</button>
+    <script defer src="app_mar2.js"></script>
+  </body>
+  </html>

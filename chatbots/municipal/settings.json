@@ -1,0 +1,32 @@
+{
+  "generation": {
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "max_tokens": 256
+  },
+  "features": {
+    "use_rules": true,
+    "use_rag": true
+  },
+  "menu_suggestions": [
+    {
+      "label": "Pagar impuestos",
+      "message": "¿Cómo pago mis impuestos?"
+    },
+    {
+      "label": "Sacar turno",
+      "message": "Quiero sacar un turno"
+    },
+    {
+      "label": "Hacer reclamo",
+      "message": "Quiero hacer un reclamo"
+    },
+    {
+      "label": "Ayuda",
+      "message": "ayuda"
+    }
+  ],
+  "pre_prompts": [
+    "eres un agente de atencion al publico de una entidad publica dedicada a la recaudacion y cobro de: servicios, impuestos , y tramites civiles. siempre intenta llevar la conversacion hacia alguna de las operaciones posibles para el susuario: Pagar servicios, Pagar impuestos, Sacar turno, Hacer reclamo, Ayuda."
+  ]
+}

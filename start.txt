@@ -1,0 +1,38 @@
+# Inicio rápido del Chatbot Municipal
+
+## Preparación del entorno
+1. Desde la raíz del proyecto (donde ves este `start.txt`), activá el entorno virtual incluido:
+   ```bash
+   source bin/activate
+   ```
+2. Instalá las dependencias mínimas y de desarrollo si aún no lo hiciste:
+   ```bash
+   make install-base
+   make install-dev
+   ```
+3. (Opcional) Ejecutá la suite de pruebas para verificar el estado actual:
+   ```bash
+   make test
+   ```
+
+## Ejecución manual
+1. Iniciá la API FastAPI:
+   ```bash
+   uvicorn services.api.main:app --reload
+   ```
+2. En otra terminal, serví el frontend estático:
+   ```bash
+   python -m http.server --directory frontend 5173
+   ```
+3. Abrí el navegador en `http://localhost:5173` para ver el Portal y elegir una variante (Municipal o MAR2). También podés ir directo a `http://localhost:5173/municipal.html` o `http://localhost:5173/mar2.html`.
+
+## Ejecución automatizada
+- Ejecutá el script `./start.sh` para levantar la API y el servidor estático en sesiones separadas (usa `tmux` si está disponible).
+- Detenelos con `Ctrl+C` en cada proceso o cerrando la sesión de `tmux`.
+
+## (Opcional) Usar un LLM local
+1. Instalá dependencias avanzadas: `make install-rag`.
+2. Al activar el entorno (`source bin/activate`), se ejecuta `scripts/export_webchatbot_env.sh`, que fija `LLM_MODEL_PATH` al modelo Gemma 3 1B (`/home/jim/.cache/llama.cpp/ggml-org_gemma-3-1b-it-GGUF_gemma-3-1b-it-Q4_K_M.gguf`).
+3. Si preferís otro `.gguf`, exportá `WEBCHATBOT_DEFAULT_LLM_MODEL_PATH` o `LLM_MODEL_PATH` con la ruta deseada **antes** de activar el entorno.
+4. (Opcionales) Ajustá `LLM_MAX_TOKENS`, `LLM_TEMPERATURE`, `LLM_TOP_P`, `LLM_CONTEXT_WINDOW` a tu gusto.
+5. Levantá la API con `uvicorn ...`. Si el modelo no es compatible con tu versión de `llama-cpp-python`, el orquestador volverá a la respuesta placeholder.

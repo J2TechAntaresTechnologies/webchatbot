@@ -1,0 +1,8 @@
+{
+  "id": "municipal",
+  "name": "Chatbot Municipal",
+  "description": "Versión guiada con reglas/FAQ y RAG básico.",
+  "channel": "web",
+  "frontend_page": "municipal.html"
+}
+

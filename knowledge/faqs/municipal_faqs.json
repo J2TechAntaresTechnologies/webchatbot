@@ -1,0 +1,80 @@
+[
+  {
+    "uid": "faq-001",
+    "question": "¿Dónde puedo consultar ordenanzas municipales?",
+    "answer": "Las ordenanzas vigentes están disponibles en ordenanzas.municipio.gob y en el Centro de Documentación Ciudadana.",
+    "tags": ["ordenanza", "documentacion", "normativa"]
+  },
+  {
+    "uid": "faq-002",
+    "question": "¿Cómo solicito un permiso de poda?",
+    "answer": "El permiso de poda se gestiona online en Trámites > Ambiente o de forma presencial en Atención Vecinal con turno previo.",
+    "tags": ["ambiente", "permisos", "podas"]
+  },
+  {
+    "uid": "faq-003",
+    "question": "¿Qué hago si quiero denunciar ruidos molestos?",
+    "answer": "Podés registrar el reclamo en la app Municipalidad Cerca o comunicarte al 0800-123-4567 opción 3 para ruidos molestos.",
+    "tags": ["ruidos", "reclamos", "convivencia"]
+  },
+  {
+    "uid": "faq-004",
+    "question": "¿Cuál es la ordenanza vigente sobre podas?",
+    "answer": "La ordenanza 3210/18 regula la poda urbana. Consultala completa en ordenanzas.municipio.gob o en Atención Vecinal.",
+    "tags": ["ordenanza", "podas", "arbolado"]
+  },
+  {
+    "uid": "faq-005",
+    "question": "¿Cómo pago mis impuestos municipales?",
+    "answer": "Ingresá a Trámites > Pagos en la web oficial o acercate a las entidades adheridas con tu boleta. Se aceptan tarjetas, débito automático y pagos electrónicos.",
+    "tags": ["pagos", "impuestos", "tasas"]
+  },
+  {
+    "uid": "faq-006",
+    "question": "¿Cómo reporto una luminaria apagada?",
+    "answer": "Cargá el reclamo en la app Municipalidad Cerca indicando la ubicación exacta o llamá al 0800-123-4567 opción 2 (Servicios).",
+    "tags": ["luminarias", "reclamos", "servicios"]
+  },
+  {
+    "uid": "faq-007",
+    "question": "¿Cuáles son los horarios de atención?",
+    "answer": "La atención al público es de lunes a viernes de 9 a 17 hs y los sábados de 9 a 13 hs para trámites rápidos.",
+    "tags": ["horarios", "atencion", "oficinas"]
+  },
+  {
+    "uid": "faq-008",
+    "question": "¿Cómo solicito un certificado de libre deuda?",
+    "answer": "Tramitá el certificado desde Trámites > Impuestos > Libre Deuda. Podés descargarlo en PDF una vez emitido.",
+    "tags": ["certificados", "libre deuda", "impuestos"]
+  },
+  {
+    "uid": "faq-009",
+    "question": "¿Cómo pido un turno para atención?",
+    "answer": "Ingresá a turnos.municipio.gob para solicitar, consultar o reprogramar tu turno.",
+    "tags": ["turnos", "tramites", "atencion"]
+  },
+  {
+    "uid": "faq-010",
+    "question": "¿Cómo habilito un comercio?",
+    "answer": "Iniciá el trámite en Trámites > Habilitaciones Comerciales. Consultá requisitos por rubro y subí la documentación desde la plataforma.",
+    "tags": ["comercios", "habilitaciones", "permisos"]
+  },
+  {
+    "uid": "faq-011",
+    "question": "¿Dónde consulto el seguimiento de un expediente?",
+    "answer": "Accedé a Expedientes en la web del municipio con el número de expediente o tu DNI para ver su estado.",
+    "tags": ["expedientes", "seguimiento", "tramites"]
+  },
+  {
+    "uid": "faq-012",
+    "question": "¿Cómo denuncio basura en la vía pública?",
+    "answer": "Registrá el reclamo en la app Municipalidad Cerca adjuntando una foto o llamá al 0800-123-4567 opción 2.",
+    "tags": ["residuos", "reclamos", "ambiente"]
+  },
+  {
+    "uid": "faq-013",
+    "question": "¿Cuál es el cronograma de recolección de residuos?",
+    "answer": "Consultá el calendario por barrio en residuos.municipio.gob o en Atención Vecinal.",
+    "tags": ["residuos", "recoleccion", "servicios"]
+  }
+]

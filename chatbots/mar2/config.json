@@ -1,0 +1,8 @@
+{
+  "id": "mar2",
+  "name": "MAR2 (Modo libre)",
+  "description": "Conversación libre directa al LLM (sin menú inicial).",
+  "channel": "mar2",
+  "frontend_page": "mar2.html"
+}
+

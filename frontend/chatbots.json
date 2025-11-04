@@ -1,0 +1,15 @@
+[
+  {
+    "id": "municipal",
+    "name": "Chatbot Municipal",
+    "description": "Versión guiada con reglas/FAQ y RAG básico.",
+    "frontend_page": "municipal.html"
+  },
+  {
+    "id": "mar2",
+    "name": "MAR2 (Modo libre)",
+    "description": "Conversación libre, directo al LLM.",
+    "frontend_page": "mar2.html"
+  }
+]
+

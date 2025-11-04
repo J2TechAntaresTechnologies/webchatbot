@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portal de Chatbots</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="chat-container" aria-label="Portal de Chatbots">
+      <div class="topbar">
+        <h1>Portal de Chatbots</h1>
+        <div class="top-controls">
+          <label for="theme-select-quick" class="theme-label">Tema:</label>
+          <select id="theme-select-quick" class="theme-select" aria-label="Seleccionar tema"></select>
+          <button id="theme-open" type="button" class="btn-link" aria-haspopup="dialog" title="Configurar temas">Configuración</button>
+        </div>
+      </div>
+      <p class="hint">Seleccioná una variante para iniciar una conversación.</p>
+      <section id="bot-list" class="chat-log" aria-live="polite"></section>
+    </main>
+    <!-- Modal de configuración -->
+    <div id="settings-backdrop" class="modal-backdrop" hidden>
+      <div class="modal" role="dialog" aria-labelledby="settings-title" aria-modal="true">
+        <div class="modal-header">
+          <h2 id="settings-title">Parámetros</h2>
+          <button id="settings-help" type="button" class="btn-link" aria-haspopup="dialog">Help</button>
+        </div>
+        <p id="settings-feedback" class="hint" role="status" aria-live="polite"></p>
+        <form id="settings-form" class="settings-form">
+          <fieldset>
+            <legend>Generación</legend>
+            <label>Temperature <input id="stg-temperature" name="temperature" type="number" step="0.05" min="0" max="2" /></label>
+            <label>Top-p <input id="stg-topp" name="top_p" type="number" step="0.05" min="0" max="1" /></label>
+            <label>Max tokens <input id="stg-maxtokens" name="max_tokens" type="number" step="1" min="1" max="4096" /></label>
+          </fieldset>
+          <fieldset>
+            <legend>Comportamiento</legend>
+            <label><input id="stg-userules" type="checkbox" /> Usar reglas/FAQ</label>
+            <label><input id="stg-userag" type="checkbox" /> Usar RAG</label>
+          </fieldset>
+          <fieldset>
+            <legend>Instrucciones iniciales (pre-prompts)</legend>
+            <div id="stg-preprompts" class="suggestions-editor"></div>
+            <button id="stg-add-preprompt" type="button" class="btn-link">Agregar instrucción</button>
+          </fieldset>
+          <fieldset>
+            <legend>Menú (sugerencias)</legend>
+            <div id="stg-suggestions" class="suggestions-editor"></div>
+            <button id="stg-add-suggestion" type="button" class="btn-link">Agregar sugerencia</button>
+          </fieldset>
+        </form>
+        <div class="modal-actions">
+          <button id="settings-save" type="button">Guardar</button>
+          <button id="settings-reset" type="button">Restablecer</button>
+          <button id="settings-cancel" type="button" class="btn-secondary">Cancelar</button>
+        </div>
+      </div>
+    </div>
+    <!-- Ayuda de parámetros -->
+    <div id="help-backdrop" class="modal-backdrop" hidden>
+      <div class="modal" role="dialog" aria-labelledby="help-title" aria-modal="true">
+        <h2 id="help-title">Ayuda — Parámetros (MAR2 modo libre)</h2>
+        <div class="help-body">
+          <p><strong>Generación</strong></p>
+          <ul>
+            <li><strong>Temperature</strong>: aleatoriedad/creatividad del modelo. Más alto = respuestas más creativas y variadas; más bajo = más precisas y repetibles. Recomendado en MAR2: 0.8–1.1. Default: 0.7.</li>
+            <li><strong>Top‑p</strong>: “nucleus sampling”, limita el muestreo al núcleo de probabilidad acumulada. 0.9–1.0 da más variedad; 0.6–0.8 lo hace más conservador. Default: 0.9.</li>
+            <li><strong>Max tokens</strong>: longitud máxima de la respuesta. Más alto = respuestas más largas pero más lentas; muy bajo puede truncar. Default: 256.</li>
+          </ul>
+          <p><strong>Instrucciones iniciales (pre‑prompts)</strong></p>
+          <ul>
+            <li>Lista de indicaciones previas que el bot tendrá en cuenta antes de responder (p. ej.: “comportate como especialista en mecánica”, “respuestas breves”). Se inyectan automáticamente en el prompt del modelo.</li>
+          </ul>
+          <p><strong>Comportamiento</strong></p>
+          <ul>
+            <li><strong>Usar reglas/FAQ</strong> y <strong>Usar RAG</strong>: en MAR2 no aplican (va directo al LLM). En el bot Municipal sí tienen efecto.</li>
+          </ul>
+          <p><strong>Menú (sugerencias)</strong></p>
+          <ul>
+            <li>Guarda pares Etiqueta/Mensaje. En Municipal se muestran como chips. En MAR2 no se muestran por diseño (se puede habilitar si lo necesitás).</li>
+          </ul>
+          <p><strong>Persistencia</strong></p>
+          <ul>
+            <li>Los cambios se guardan para todos en el servidor (chatbots/&lt;id&gt;/settings.json) y sobreviven reinicios. “Restablecer” vuelve a los valores estándar.</li>
+          </ul>
+        </div>
+        <div class="modal-actions">
+          <button id="help-close" type="button" class="btn-secondary">Cerrar</button>
+        </div>
+      </div>
+    </div>
+    <!-- Configuración de tema -->
+    <div id="theme-backdrop" class="modal-backdrop" hidden>
+      <div class="modal" role="dialog" aria-labelledby="theme-title" aria-modal="true">
+        <div class="modal-header">
+          <h2 id="theme-title">Configuración de tema</h2>
+        </div>
+        <form id="theme-form" class="settings-form">
+          <fieldset>
+            <legend>Seleccionar tema</legend>
+            <label for="theme-list">Temas guardados</label>
+            <select id="theme-list" class="theme-select" aria-label="Temas disponibles"></select>
+          </fieldset>
+          <fieldset>
+            <legend>Editar colores</legend>
+            <div class="theme-grid">
+              <label>Accent <input id="th-accent" type="color" /></label>
+              <label>Accent fuerte <input id="th-accent-strong" type="color" /></label>
+              <label>Surface <input id="th-surface" type="color" /></label>
+              <label>Surface brillante <input id="th-surface-bright" type="color" /></label>
+              <label>Texto primario <input id="th-text-primary" type="color" /></label>
+              <label>Texto secundario <input id="th-text-secondary" type="color" /></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Tipografía</legend>
+            <label>Familia de fuente
+              <input id="th-font-family" type="text" placeholder="p.ej. Inter, system-ui, sans-serif" />
+            </label>
+            <label>Tamaño base (px)
+              <input id="th-font-size" type="number" min="12" max="24" step="1" placeholder="16" />
+            </label>
+          </fieldset>
+          <fieldset>
+            <legend>Guardar como</legend>
+            <label>Nombre del tema <input id="theme-name" type="text" placeholder="p.ej. Municipalidad Azul" /></label>
+          </fieldset>
+        </form>
+        <div class="modal-actions">
+          <button id="theme-apply" type="button">Aplicar</button>
+          <button id="theme-save" type="button">Guardar</button>
+          <button id="theme-update" type="button">Actualizar</button>
+          <button id="theme-delete" type="button" class="btn-secondary">Eliminar</button>
+          <button id="theme-reset" type="button" class="btn-secondary">Restablecer</button>
+          <button id="theme-close" type="button" class="btn-secondary">Cerrar</button>
+        </div>
+      </div>
+    </div>
+    <script defer src="portal.js"></script>
+  </body>
+</html>

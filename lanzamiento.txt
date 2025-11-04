@@ -1,0 +1,2 @@
+./bin/python -m uvicorn services.api.main:app --reload
+./bin/python -m http.server --directory frontend 5173

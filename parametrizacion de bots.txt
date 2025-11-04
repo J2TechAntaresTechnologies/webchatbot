@@ -1,0 +1,72 @@
+Parametrización de bots
+=======================
+
+Alcance y persistencia
+- Cada bot (por ej. municipal, mar2) tiene su configuración propia.
+- Los cambios se guardan en el servidor para todos los usuarios del bot.
+- Archivo de guardado: chatbots/<id>/settings.json (sobrevive reinicios).
+- Endpoints de la API:
+  - GET /chatbots/{id}/settings?channel=...
+  - PUT /chatbots/{id}/settings
+  - POST /chatbots/{id}/settings/reset
+
+Generación
+- Temperature
+  - Controla la aleatoriedad: bajo = más preciso/repetible; alto = más creativo/variable.
+  - Rango válido (con límites en backend): 0.0 a 2.0. Default: 0.7.
+  - Sugerencia: bájala si ves alucinaciones; súbela si las respuestas son muy secas.
+- Top-p
+  - “Nucleus sampling”: limita el muestreo al porcentaje de probabilidad acumulada indicado.
+  - Rango válido: 0.0 a 1.0. Default: 0.9.
+  - Sugerencia: 0.6–0.8 más conservador; 0.9–1.0 más variedad.
+- Max tokens
+  - Longitud máxima de la respuesta del modelo (>= 1). Default: 256.
+  - Muy bajo trunca; muy alto aumenta latencia/costo.
+
+Consejos rápidos
+- Municipal (informativo): temperature 0.6–0.8, top_p 0.8–0.95, max_tokens 200–400.
+- MAR2 (creativo): temperature 0.8–1.1, top_p 0.9–1.0, max_tokens según tolerancia de latencia.
+- Cambia un parámetro por vez para evaluar impacto.
+
+Comportamiento
+- Usar reglas/FAQ
+  - Activa el motor de reglas para saludos, “ayuda”, FAQs, etc. Respuestas curadas y consistentes.
+  - Si se desactiva, esas consultas no pasan por reglas y caen al LLM/RAG.
+- Usar RAG
+  - Activa la búsqueda en la base de conocimiento cuando el clasificador detecta consultas “rag”.
+  - Si se desactiva, se responde con LLM directo (más riesgo de inventos).
+
+Menú (sugerencias)
+- Editor simple con filas “Etiqueta” + “Mensaje”.
+- En el chat municipal se renderizan como “chips” clicables arriba del formulario. Al hacer clic, se completa el input con el Mensaje.
+- MAR2 no muestra menú por diseño.
+
+Botones del modal
+- Guardar: persiste en servidor para todos los usuarios del bot. Efecto inmediato.
+- Restablecer: vuelve a los valores estándar (predeterminados del sistema), no a tu última edición.
+- Cancelar: cierra sin guardar.
+
+Valores estándar (defaults) por variante
+- municipal
+  - Generación: temperature 0.7, top_p 0.9, max_tokens 256.
+  - Comportamiento: usar reglas = True, usar RAG = True.
+  - Menú: [Pagar impuestos, Sacar turno, Hacer reclamo, Ayuda].
+- mar2
+  - Generación: temperature 0.7, top_p 0.9, max_tokens 256.
+  - Comportamiento: usar reglas = False, usar RAG = False.
+  - Menú: sin sugerencias.
+
+Aplicación técnica (resumen)
+- El chat envía el campo bot_id junto a channel y message.
+- El orquestador carga settings por bot y:
+  - Respeta switches “usar reglas/usar RAG”.
+  - Pasa temperature/top_p/max_tokens al generador LLM.
+- Backend aplica límites de seguridad:
+  - temperature: [0.0, 2.0]
+  - top_p: [0.0, 1.0]
+  - max_tokens: >= 1
+
+Notas útiles
+- Municipal muestra las sugerencias configuradas si existen; si no, se mantiene el comportamiento actual.
+- Restablecer escribe nuevamente los valores estándar en chatbots/<id>/settings.json.
+

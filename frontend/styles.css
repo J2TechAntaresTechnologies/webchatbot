@@ -1,0 +1,311 @@
+:root {
+  color-scheme: dark;
+  --font-family: "Segoe UI", system-ui, sans-serif;
+  --font-size: 16px;
+  --bg-main: radial-gradient(circle at 20% 10%, #152132, #0f172a 55%, #0b1120);
+  --surface: rgba(30, 41, 59, 0.9);
+  --surface-strong: #1c2a44;
+  --surface-soft: #273955;
+  --surface-bright: #324768;
+  --accent: #38bdf8;
+  --accent-strong: #6366f1;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5f5;
+  --border-subtle: rgba(148, 163, 184, 0.35);
+}
+
+body {
+  margin: 0;
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-main);
+  justify-content: center;
+  align-items: center;
+  color: var(--text-primary);
+  font-family: var(--font-family, "Segoe UI", system-ui, sans-serif);
+  font-size: var(--font-size, 16px);
+}
+
+/* Barra superior en el portal */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.top-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-select {
+  background: rgba(49, 65, 94, 0.25);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.35rem 0.5rem;
+}
+
+.theme-label {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.chat-container {
+  width: min(640px, 95vw);
+  background: linear-gradient(160deg, var(--surface), rgba(15, 23, 42, 0.82));
+  padding: 1.75rem;
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.chat-container h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.chat-log {
+  flex: 1;
+  min-height: 280px;
+  max-height: 420px;
+  overflow-y: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: linear-gradient(150deg, rgba(49, 65, 94, 0.15), rgba(15, 23, 42, 0.65));
+
+  color: var(--text-primary);
+}
+
+.message {
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px;
+  max-width: 80%;
+  line-height: 1.5;
+  color: inherit;
+}
+
+.message.user {
+  margin-left: auto;
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+  color: #07101f;
+  font-weight: 500;
+  box-shadow: 0 12px 24px rgba(56, 189, 248, 0.25);
+}
+
+.message.bot {
+  background: var(--surface-bright);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 12px 26px rgba(12, 20, 33, 0.5);
+}
+
+.chat-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.chat-form label {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.6rem;
+}
+
+input {
+  flex: 1;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  background: rgba(17, 25, 40, 0.8);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+button {
+  border: none;
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(99, 102, 241, 0.35);
+  filter: brightness(1.05);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.config-summary {
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: rgba(49, 65, 94, 0.25);
+  padding: 0.6rem 0.8rem;
+  color: var(--text-primary);
+}
+
+.config-summary .kv {
+  display: inline-block;
+  margin-right: 1rem;
+  font-size: 0.95rem;
+}
+
+.config-summary .kv b { color: var(--text-secondary); }
+
+.config-summary .chips {
+  margin-top: 0.4rem;
+}
+
+.chat-log::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-log::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 999px;
+}
+
+/* Portal: enlaces como botones */
+.btn-link {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  text-decoration: none;
+  background: rgba(49, 65, 94, 0.25);
+}
+
+.btn-secondary {
+  background: var(--surface-soft);
+}
+
+/* Modal de configuración */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Asegura que el atributo hidden siempre oculte el modal, incluso si hay display definido */
+.modal-backdrop[hidden] {
+  display: none !important;
+}
+
+.modal {
+  width: min(680px, 92vw);
+  background: linear-gradient(160deg, var(--surface), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 14px;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.55);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.settings-form fieldset {
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 10px;
+  margin: 0 0 0.9rem 0;
+  padding: 0.8rem;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.settings-form label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0.8rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+
+.suggestions-editor .row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.5rem;
+  margin: 0.4rem 0;
+}
+
+.suggestion-chip {
+  display: inline-block;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  margin-right: 0.3rem;
+  background: rgba(49, 65, 94, 0.25);
+  cursor: pointer;
+}
+
+/* Botón flotante de salida */
+.fab-exit {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1100;
+  padding: 0.8rem 1.1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ef4444, #f59e0b);
+  color: #0b1020;
+  font-weight: 700;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.45);
+}
+
+.fab-exit:hover {
+  filter: brightness(1.05);
+}

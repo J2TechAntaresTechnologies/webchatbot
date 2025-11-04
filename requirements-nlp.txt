@@ -1,0 +1,2 @@
+# Dependencias opcionales para procesamiento de lenguaje
+spacy==3.7.4

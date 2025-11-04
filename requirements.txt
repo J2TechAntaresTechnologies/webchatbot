@@ -1,0 +1,11 @@
+# Dependencias principales del proyecto.
+# Instala este archivo para la API y el orquestador mínimos.
+-r requirements/base.txt
+
+# Dependencias opcionales:
+# -r requirements/rag.txt  # Funcionalidades RAG/LLM y observabilidad (pesadas)
+# -r requirements/dev.txt  # Herramientas de pruebas y desarrollo
+
+# Nota: instala los extras según la necesidad, por ejemplo
+#   pip install -r requirements/dev.txt
+# Esto incluye pytest y utilidades de test.

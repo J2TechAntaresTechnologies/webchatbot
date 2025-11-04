@@ -1,0 +1,144 @@
+Contexto de cambios — Portal de Chatbots
+=======================================
+
+Resumen (estado actual)
+- Se convirtió la landing en un Portal de chatbots: ahora `frontend/index.html` lista variantes a partir de `frontend/chatbots.json` usando `frontend/portal.js`.
+- Variantes activas:
+  * Municipal (flujo guiado): `frontend/municipal.html` (usa `frontend/app.js`, canal "web").
+  * MAR2 (modo libre): `frontend/mar2.html` (usa `frontend/app_mar2.js`, canal "mar2").
+- Registro y metadatos por variante: `chatbots/municipal/config.json` y `chatbots/mar2/config.json`.
+- Modelos compartidos: carpeta `modelos/` (el script `scripts/export_webchatbot_env.sh` toma el primer `.gguf` allí si no hay `LLM_MODEL_PATH`).
+- Documentación ampliada:
+  * Guía del portal: `portal/README.md`.
+  * README principal actualizado con estructura y portal: `README.md`.
+  * Frontend README actualizado (portal y override de API): `frontend/README.md`.
+  * Arquitectura con portal: `docs/architecture.md`.
+  * Cómo agregar variantes (paso a paso): `docs/manual_aprendizaje.md` (sección 4.5).
+  * README alternativo (MAR2) actualizado: `README_ALTERNATIVO.txt`.
+- Atajos de ejecución rápida: `lanzamiento.txt` (dos comandos, uno por terminal).
+- Tests: 7/7 en verde (`./bin/python -m pytest`).
+
+Archivos añadidos o modificados (principal)
+- Añadidos:
+  * `frontend/portal.js`, `frontend/chatbots.json`, `frontend/municipal.html`.
+  * `chatbots/README.md`, `chatbots/municipal/config.json`, `chatbots/mar2/config.json`.
+  * `modelos/.gitkeep` (placeholder para modelos compartidos).
+  * `portal/README.md` (guía integral), `lanzamiento.txt` (dos comandos de arranque).
+- Modificados:
+  * `frontend/index.html` → ahora es el Portal.
+  * `frontend/README.md` → instrucciones del Portal y override de API.
+  * `scripts/export_webchatbot_env.sh` → preferencia automática a `modelos/*.gguf`.
+  * `docs/architecture.md`, `docs/manual_aprendizaje.md`, `README.md`, `README_ALTERNATIVO.txt`, `start.txt`.
+
+Ejecución rápida (copiar/pegar en terminales separadas)
+1) API FastAPI:
+   ./bin/python -m uvicorn services.api.main:app --reload
+2) Servidor estático frontend:
+   ./bin/python -m http.server --directory frontend 5173
+
+Portal y variantes
+- Portal: http://localhost:5173
+- Municipal (guiado): http://localhost:5173/municipal.html
+- MAR2 (libre): http://localhost:5173/mar2.html
+
+Override de URL de API (opcional)
+Insertar antes del script en la página HTML:
+  <script>window.WEBCHATBOT_API_BASE_URL = "https://mi-dominio.com";</script>
+
+Cómo agregar un nuevo chatbot (resumen)
+1) `chatbots/<id>/config.json` con campos: id, name, description, channel, frontend_page.
+2) Crear `frontend/<id>.html` y reutilizar/crear script (definir `channel` en el body del POST).
+3) Añadir entrada en `frontend/chatbots.json` para que aparezca en el Portal.
+4) Opcional backend: ramificar por `request.channel` en `services/orchestrator/service.py` si requiere ruta específica (reglas/RAG/LLM).
+5) Modelos: colocar `.gguf` en `modelos/` o exportar `LLM_MODEL_PATH`.
+
+Notas y pendientes
+- CORS de producción: ajustar `allowed_origins` en `services/api/main.py` o usar reverse proxy/TLS.
+- LLM local: si no hay modelo compatible, el sistema responde con placeholder.
+- Posible endpoint GET /chatbots para servir el registro desde la API (hoy es JSON estático en frontend).
+
+Diagnóstico útil
+- `./bin/python scripts/check_host_readiness.py --skip-public-ip`
+
+Última sesión
+- Cambios realizados por Codex CLI (portal, configs, docs, lanzador). Tests OK.
+
+=== Entrada contexto — 2025-10-04 10:13:19 UTC (local 2025-10-04 07:13:19 ) ===
+Nota: Guardado manual solicitado: explicación de automatización de contexto y comandos de uso.
+Python: 3.10.12 (/home/jim/enviroments/webchatbot/bin/python) | Sistema: Linux-5.15.0-157-lowlatency-x86_64-with-glibc2.35
+Chatbots registrados: 2 → mar2[mar2]→mar2.html, municipal[web]→municipal.html
+Últimos archivos modificados:
+ - start.sh
+ - scripts/export_webchatbot_env.sh
+ - Makefile
+ - scripts/context_manager.py
+ - contexto.txt
+ - lanzamiento.txt
+ - portal/README.md
+ - README_ALTERNATIVO.txt
+ - start.txt
+ - docs/manual_aprendizaje.md
+=== Fin de entrada ===
+--- Explicación detallada (guardar contexto) ---
+Hecho. Automatizé lectura/guardado del contexto y dejé comandos listos.
+
+Qué agregué
+- scripts/context_manager.py: show (—brief) y save (—auto, —note) para gestionar contexto.
+- Integración automática:
+  - scripts/export_webchatbot_env.sh muestra el contexto al activar el entorno (deshabilitable con WEBCHATBOT_CONTEXT_ON_ACTIVATE=0).
+  - start.sh imprime el contexto antes de lanzar API/frontend.
+- Atajos Make:
+  - make context-show (muestra última entrada).
+  - make context-save (guarda entrada automática).
+- Historial actual en contexto.txt.
+
+Cómo usar
+- Ver contexto: ./bin/python scripts/context_manager.py show --brief  (o make context-show)
+- Guardar contexto: ./bin/python scripts/context_manager.py save --auto --note "mi nota" (o make context-save)
+- Al iniciar: verás el último contexto al activar el entorno o ejecutar ./start.sh.
+
+Opciones
+- Desactivar impresión automática al activar: export WEBCHATBOT_CONTEXT_ON_ACTIVATE=0 antes de source scripts/export_webchatbot_env.sh
+
+Sugerencia rápida
+- Alias "guardar contexto": alias guardar_contexto='./bin/python scripts/context_manager.py save --auto'
+
+Notas
+- Portal y variantes listos (index.html portal, municipal.html, mar2.html).
+- Modelos compartidos en modelos/ con autodetección en el script de entorno.
+- Pruebas 7/7 en verde; no se modificó el contrato de la API.
+--- Fin de explicación ---
+
+=== Entrada contexto — 2025-10-04 10:24:15 UTC (local 2025-10-04 07:24:15 ) ===
+Nota: IDE: activo=frontend/README.md; tabs=[tests/unit/test_orchestrator_basic.py, services/orchestrator/intent_classifier.py, scripts/export_webchatbot_env.sh, scripts/check_host_readiness.py, README.md, frontend/mar2.html, frontend/README.md]
+Python: 3.10.12 (/home/jim/enviroments/webchatbot/bin/python) | Sistema: Linux-5.15.0-157-lowlatency-x86_64-with-glibc2.35
+Chatbots registrados: 2 → mar2[mar2]→mar2.html, municipal[web]→municipal.html
+Últimos archivos modificados:
+ - contexto.txt
+ - start.sh
+ - scripts/export_webchatbot_env.sh
+ - Makefile
+ - scripts/context_manager.py
+ - lanzamiento.txt
+ - portal/README.md
+ - README_ALTERNATIVO.txt
+ - start.txt
+ - docs/manual_aprendizaje.md
+=== Fin de entrada ===
+
+=== Entrada contexto — 2025-10-04 10:34:54 UTC (local 2025-10-04 07:34:54 ) ===
+Nota: IDE: activo=frontend/README.md; tabs=[tests/unit/test_orchestrator_basic.py, services/orchestrator/intent_classifier.py, scripts/export_webchatbot_env.sh, scripts/check_host_readiness.py, README.md, frontend/mar2.html, frontend/README.md]
+Python: 3.10.12 (/home/jim/enviroments/webchatbot/bin/python) | Sistema: Linux-5.15.0-157-lowlatency-x86_64-with-glibc2.35
+Chatbots registrados: 2 → mar2[mar2]→mar2.html, municipal[web]→municipal.html
+Últimos archivos modificados:
+ - frontend/app_mar2.js
+ - frontend/app.js
+ - frontend/portal.js
+ - frontend/styles.css
+ - frontend/index.html
+ - services/orchestrator/service.py
+ - services/orchestrator/schema.py
+ - services/api/main.py
+ - services/chatbots/router.py
+ - services/chatbots/models.py
+=== Fin de entrada ===
