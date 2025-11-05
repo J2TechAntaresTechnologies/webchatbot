@@ -183,3 +183,4 @@ Revisá `docs/roadmap.md` para un plan con los próximos 10 hitos técnicos.
 - `frontend/portal.js`: endpoints de configuración, `API_BASE_URL` y consejos.
 - `frontend/app.js`: cliente Municipal (channel "web").
 - `frontend/app_mar2.js`: cliente MAR2 (modo libre).
+# webchatbot
