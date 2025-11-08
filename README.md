@@ -1,3 +1,7 @@
+<img src="docs/antares_technologies_srl_cover.jpeg" alt="Antares Technologies SRL — Cover">
+
+# webchatbot
+
 # Chatbot Municipal Híbrido
 
 Base del proyecto para un chatbot web municipal que combina respuestas fijas con generación vía LLM bajo guardrails.
@@ -196,4 +200,6 @@ Revisá `docs/roadmap.md` para un plan con los próximos 10 hitos técnicos.
 - `frontend/app.js`: cliente Municipal (channel "web").
 - `frontend/app_mar2.js`: cliente MAR2 (modo libre).
 # webchatbot
-# webchatbot
+<p align="center">
+  <img src="docs/antares_technologies_srl_logo.jpeg" alt="Antares Technologies SRL — Logo">
+</p>
