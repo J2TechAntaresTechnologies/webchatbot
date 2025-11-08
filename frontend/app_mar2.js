@@ -1,6 +1,7 @@
 // MAR2 - modo libre sin prompt ni menú
 
 // --- Tema activo desde localStorage ---
+// Aplica el tema activo leyendo variables de localStorage y setea CSS variables
 (function applyActiveTheme() {
   try {
     const THEME_KEY = 'webchatbot_themes';
@@ -33,13 +34,16 @@ const generateSessionId = () => {
   return `session-${Date.now()}-${randomSuffix}`;
 };
 
+// Identificador único de sesión para correlacionar turnos en MAR2
 const sessionId = generateSessionId();
+// Identificador de la variante MAR2 (modo libre)
 const BOT_ID = "mar2";
 let currentController = null;
 const chatLog = document.getElementById("chat-log");
 const form = document.getElementById("chat-form");
 const input = document.getElementById("message");
 
+// Construye la URL base de la API (autodetección o override global)
 const API_BASE_URL = (() => {
   const override = typeof window !== "undefined" ? window.WEBCHATBOT_API_BASE_URL : null;
   if (typeof override === "string" && override.trim() !== "") {
@@ -56,10 +60,23 @@ const API_BASE_URL = (() => {
   return "";
 })();
 
+// Escapa HTML y reemplaza \n por <br> para formateo legible
+function toSafeHtml(text) {
+  const s = String(text ?? "");
+  const escaped = s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+  return escaped.replace(/\n/g, "<br>");
+}
+
+// Agrega burbujas de conversación (usuario/bot) al log
 const appendMessage = (role, text) => {
   const bubble = document.createElement("article");
   bubble.classList.add("message", role);
-  bubble.textContent = text;
+  bubble.innerHTML = toSafeHtml(text);
   chatLog.appendChild(bubble);
   chatLog.scrollTop = chatLog.scrollHeight;
 };

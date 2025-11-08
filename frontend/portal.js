@@ -1,7 +1,9 @@
 // Carga el listado de chatbots desde chatbots.json y renderiza tarjetas de selección.
 
 // ==== Gestor de temas (frontend, localStorage) ====
+// Gestor de temas (persistencia en localStorage + aplicación en runtime)
 (function themeManager() {
+  // Claves de almacenamiento y variables CSS admitidas por el gestor de temas
   const THEME_KEY = 'webchatbot_themes';
   const ACTIVE_KEY = 'webchatbot_active_theme';
   const VARS = ['--accent', '--accent-strong', '--surface', '--surface-bright', '--text-primary', '--text-secondary', '--font-family', '--font-size'];
@@ -70,6 +72,7 @@
     localStorage.setItem(THEME_KEY, JSON.stringify(data));
   }
 
+  // Aplica un objeto { cssVar: valor } al :root del documento
   function applyThemeVars(vars) {
     const root = document.documentElement;
     for (const k of VARS) {
@@ -106,6 +109,7 @@
     }
   }
 
+  // Abre el modal de edición/guardado de temas y vincula eventos de UI
   function openThemeModal() {
     const backdrop = document.getElementById('theme-backdrop');
     if (!backdrop) return;
@@ -356,6 +360,7 @@ loadChatbots().then(renderList);
 // --- Modal de configuración ---
 let currentBot = null;
 let currentSettings = null;
+let currentRules = [];
 
 function setFeedback(msg, isError = false) {
   const el = document.getElementById('settings-feedback');
@@ -466,6 +471,205 @@ function collectPreprompts(listEl) {
   return items;
 }
 
+function createRuleRow(data = {}) {
+  const row = document.createElement('div');
+  row.className = 'rule-row';
+
+  const header = document.createElement('div');
+  header.className = 'rule-row-header';
+
+  const enabledLabel = document.createElement('label');
+  const enabled = document.createElement('input');
+  enabled.type = 'checkbox';
+  enabled.className = 'rule-enabled';
+  enabled.checked = data.enabled !== false;
+  enabledLabel.appendChild(enabled);
+  enabledLabel.appendChild(document.createTextNode(' Activa'));
+
+  const sourceLabel = document.createElement('label');
+  sourceLabel.textContent = 'Origen';
+  const source = document.createElement('select');
+  source.className = 'rule-source';
+  [
+    { value: 'faq', label: 'FAQ' },
+    { value: 'fallback', label: 'Fallback' },
+  ].forEach((opt) => {
+    const option = document.createElement('option');
+    option.value = opt.value;
+    option.textContent = opt.label;
+    source.appendChild(option);
+  });
+  source.value = data.source === 'fallback' ? 'fallback' : 'faq';
+  sourceLabel.appendChild(source);
+
+  const remove = document.createElement('button');
+  remove.type = 'button';
+  remove.className = 'rule-remove';
+  remove.textContent = 'Eliminar';
+  remove.addEventListener('click', () => row.remove());
+
+  header.appendChild(enabledLabel);
+  header.appendChild(sourceLabel);
+  header.appendChild(remove);
+
+  const keywordsLabel = document.createElement('label');
+  keywordsLabel.textContent = 'Keywords (separadas por coma)';
+  const keywords = document.createElement('input');
+  keywords.type = 'text';
+  keywords.className = 'rule-keywords';
+  keywords.placeholder = 'Ej.: pago, impuesto, tasas';
+  if (Array.isArray(data.keywords)) {
+    keywords.value = data.keywords.join(', ');
+  } else {
+    keywords.value = data.keywords || '';
+  }
+  keywordsLabel.appendChild(keywords);
+
+  const responseLabel = document.createElement('label');
+  responseLabel.textContent = 'Respuesta';
+  const response = document.createElement('textarea');
+  response.className = 'rule-response';
+  response.placeholder = 'Texto a devolver cuando haga match';
+  response.value = data.response || '';
+  responseLabel.appendChild(response);
+
+  row.appendChild(header);
+  row.appendChild(keywordsLabel);
+  row.appendChild(responseLabel);
+  return row;
+}
+
+function renderRulesEditor(listEl, items) {
+  if (!listEl) return;
+  listEl.innerHTML = '';
+  const data = Array.isArray(items) ? items : [];
+  if (data.length === 0) {
+    listEl.appendChild(createRuleRow({}));
+    return;
+  }
+  for (const rule of data) {
+    listEl.appendChild(createRuleRow(rule));
+  }
+}
+
+function collectRules(listEl) {
+  if (!listEl) return [];
+  const rows = Array.from(listEl.querySelectorAll('.rule-row'));
+  const rules = [];
+  for (const row of rows) {
+    const enabled = row.querySelector('.rule-enabled')?.checked ?? true;
+    const keywordsRaw = (row.querySelector('.rule-keywords')?.value || '')
+      .split(',')
+      .map((kw) => kw.trim())
+      .filter(Boolean);
+    const response = (row.querySelector('.rule-response')?.value || '').trim();
+    const source = row.querySelector('.rule-source')?.value === 'fallback' ? 'fallback' : 'faq';
+    if (keywordsRaw.length === 0 || !response) continue;
+    rules.push({
+      enabled,
+      keywords: keywordsRaw,
+      response,
+      source,
+    });
+  }
+  return rules;
+}
+
+function renderNoMatchEditor(listEl, replies) {
+  if (!listEl) return;
+  listEl.innerHTML = '';
+  const arr = Array.isArray(replies) && replies.length ? replies : [''];
+  for (const r of arr) {
+    const row = document.createElement('div');
+    row.className = 'row';
+    const txt = document.createElement('input');
+    txt.placeholder = "Texto genérico (ej.: 'No comprendí, escribí \"ayuda\"')";
+    txt.value = (r || '').toString();
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.textContent = '✕';
+    del.addEventListener('click', () => row.remove());
+    row.appendChild(txt);
+    row.appendChild(del);
+    listEl.appendChild(row);
+  }
+}
+
+function collectNoMatch(listEl) {
+  if (!listEl) return [];
+  const rows = Array.from(listEl.querySelectorAll('.row'));
+  const out = [];
+  for (const r of rows) {
+    const txt = r.querySelector('input');
+    const val = (txt?.value || '').trim();
+    if (val) out.push(val);
+  }
+  return out;
+}
+
+// Editor dedicado de reglas (modal aparte)
+function openRulesModal() {
+  const backdrop = document.getElementById('rules-backdrop');
+  const listEl = document.getElementById('rules-editor-list');
+  if (!backdrop || !listEl) return;
+
+  // Renderizar reglas actuales
+  renderRulesEditor(listEl, Array.isArray(currentRules) ? currentRules : []);
+
+  // Handlers de UI
+  const addBtn = document.getElementById('rules-add-rule');
+  if (addBtn) {
+    addBtn.onclick = () => {
+      listEl.appendChild(createRuleRow({}));
+    };
+  }
+
+  const prevKeydown = document.onkeydown;
+  const closeModal = () => {
+    backdrop.setAttribute('hidden', '');
+    // Restaurar handler de ESC anterior (por ejemplo, del modal de parámetros)
+    document.onkeydown = prevKeydown || null;
+  };
+
+  const saveBtn = document.getElementById('rules-save');
+  const cancelBtn = document.getElementById('rules-cancel');
+  if (saveBtn) {
+    saveBtn.onclick = () => {
+      const collected = collectRules(listEl);
+      currentRules = collected;
+      updateRulesSummary();
+      closeModal();
+    };
+  }
+  if (cancelBtn) {
+    cancelBtn.onclick = () => closeModal();
+  }
+
+  // Click fuera cierra
+  backdrop.onclick = (ev) => {
+    if (ev.target === backdrop) closeModal();
+  };
+  // ESC cierra
+  document.onkeydown = (ev) => {
+    if (ev.key === 'Escape') closeModal();
+  };
+
+  // Mostrar
+  backdrop.removeAttribute('hidden');
+}
+
+function updateRulesSummary() {
+  const el = document.getElementById('stg-rules-summary');
+  if (!el) return;
+  const total = Array.isArray(currentRules) ? currentRules.length : 0;
+  if (!total) {
+    el.textContent = 'No hay reglas definidas.';
+    return;
+  }
+  const active = currentRules.filter(r => r && r.enabled !== false).length;
+  el.textContent = `${total} regla${total !== 1 ? 's' : ''} definid${total !== 1 ? 'as' : 'a'} · Activas: ${active}`;
+}
+
 async function openSettingsModal(bot) {
   currentBot = bot;
   showBackdrop(true);
@@ -474,8 +678,15 @@ async function openSettingsModal(bot) {
   const maxt = document.getElementById('stg-maxtokens');
   const useRules = document.getElementById('stg-userules');
   const useRag = document.getElementById('stg-userag');
+  const enableDefaultRules = document.getElementById('stg-enable-default-rules');
+  const ragThreshold = document.getElementById('stg-rag-threshold');
+  const genericFieldset = document.getElementById('stg-generic-fieldset');
+  const useGeneric = document.getElementById('stg-use-generic');
+  const noMatchList = document.getElementById('stg-no-match-list');
+  const noMatchPick = document.getElementById('stg-no-match-pick');
   const list = document.getElementById('stg-suggestions');
   const preList = document.getElementById('stg-preprompts');
+  const rulesEditBtn = document.getElementById('stg-rules-edit');
   try {
     const settings = await fetchSettings(bot);
     currentSettings = settings;
@@ -484,8 +695,23 @@ async function openSettingsModal(bot) {
     maxt.value = settings.generation?.max_tokens ?? 256;
     useRules.checked = !!(settings.features?.use_rules ?? true);
     useRag.checked = !!(settings.features?.use_rag ?? true);
+    ragThreshold.value = (typeof settings.rag_threshold === 'number' ? settings.rag_threshold : 0.28).toFixed(2);
+    ragThreshold.disabled = !useRag.checked;
+    enableDefaultRules.checked = !!(settings.features?.enable_default_rules ?? true);
+    if (noMatchPick) {
+      noMatchPick.value = settings.no_match_pick === 'random' ? 'random' : 'first';
+    }
+    if (bot?.id === 'municipal') {
+      genericFieldset?.removeAttribute('hidden');
+      useGeneric.checked = !!(settings.features?.use_generic_no_match ?? false);
+      renderNoMatchEditor(noMatchList, Array.isArray(settings.no_match_replies) ? settings.no_match_replies : []);
+    } else {
+      genericFieldset?.setAttribute('hidden', '');
+    }
     renderSuggestionsEditor(list, settings.menu_suggestions || []);
     renderPrepromptsEditor(preList, settings.pre_prompts || []);
+    currentRules = Array.isArray(settings.rules) ? settings.rules.slice() : [];
+    updateRulesSummary();
     setFeedback('');
   } catch (e) {
     console.error('No se pudieron cargar parámetros', e);
@@ -525,6 +751,34 @@ async function openSettingsModal(bot) {
     preList.appendChild(row);
   };
 
+  // Abrir editor dedicado de reglas
+  if (rulesEditBtn) {
+    rulesEditBtn.onclick = () => openRulesModal();
+  }
+
+  // Habilitar/deshabilitar threshold junto con el toggle de RAG
+  useRag.addEventListener('change', () => {
+    if (ragThreshold) ragThreshold.disabled = !useRag.checked;
+  });
+
+  const addNoMatchBtn = document.getElementById('stg-add-no-match');
+  if (addNoMatchBtn) {
+    addNoMatchBtn.onclick = () => {
+      if (!noMatchList) return;
+      const row = document.createElement('div');
+      row.className = 'row';
+      const txt = document.createElement('input');
+      txt.placeholder = "Texto genérico (ej.: 'No comprendí, escribí \"ayuda\"')";
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.textContent = '✕';
+      del.addEventListener('click', () => row.remove());
+      row.appendChild(txt);
+      row.appendChild(del);
+      noMatchList.appendChild(row);
+    };
+  }
+
   document.getElementById('settings-cancel').onclick = () => showBackdrop(false);
   // Cerrar al hacer click fuera del cuadro
   const backdrop = document.getElementById('settings-backdrop');
@@ -545,9 +799,11 @@ async function openSettingsModal(bot) {
     let t = parseNum(temp.value);
     let p = parseNum(topp.value);
     let m = parseNum(maxt.value);
+    let thr = parseNum(ragThreshold?.value);
     t = t === null ? ct : Math.min(Math.max(t, 0), 2);
     p = p === null ? cp : Math.min(Math.max(p, 0), 1);
     m = m === null ? cm : Math.max(Math.floor(m), 1);
+    thr = thr === null ? (Number(currentSettings?.rag_threshold) || 0.28) : Math.min(Math.max(thr, 0), 1);
 
     if (!Number.isFinite(t) || !Number.isFinite(p) || !Number.isFinite(m)) {
       setFeedback('Parámetros inválidos. Revisá los campos numéricos.', true);
@@ -563,10 +819,19 @@ async function openSettingsModal(bot) {
       features: {
         use_rules: !!useRules.checked,
         use_rag: !!useRag.checked,
+        enable_default_rules: !!enableDefaultRules.checked,
       },
+      rag_threshold: thr,
       menu_suggestions: collectSuggestions(list),
       pre_prompts: collectPreprompts(preList),
+      rules: Array.isArray(currentRules) ? currentRules : [],
     };
+    const genericVisible = genericFieldset && !genericFieldset.hasAttribute('hidden');
+    if (genericVisible) {
+      payload.features.use_generic_no_match = !!useGeneric.checked;
+      payload.no_match_replies = collectNoMatch(noMatchList);
+      payload.no_match_pick = noMatchPick?.value === 'random' ? 'random' : 'first';
+    }
     try {
       await saveSettings(bot, payload);
       setFeedback('Guardado.');
@@ -585,7 +850,23 @@ async function openSettingsModal(bot) {
       maxt.value = settings.generation?.max_tokens ?? 256;
       useRules.checked = !!(settings.features?.use_rules ?? true);
       useRag.checked = !!(settings.features?.use_rag ?? true);
+      enableDefaultRules.checked = !!(settings.features?.enable_default_rules ?? true);
+      ragThreshold.value = (typeof settings.rag_threshold === 'number' ? settings.rag_threshold : 0.28).toFixed(2);
+      ragThreshold.disabled = !useRag.checked;
+      if (bot?.id === 'municipal') {
+        genericFieldset?.removeAttribute('hidden');
+        useGeneric.checked = !!(settings.features?.use_generic_no_match ?? false);
+        renderNoMatchEditor(noMatchList, Array.isArray(settings.no_match_replies) ? settings.no_match_replies : []);
+        if (noMatchPick) {
+          noMatchPick.value = settings.no_match_pick === 'random' ? 'random' : 'first';
+        }
+      } else {
+        genericFieldset?.setAttribute('hidden', '');
+      }
       renderSuggestionsEditor(list, settings.menu_suggestions || []);
+      renderPrepromptsEditor(preList, settings.pre_prompts || []);
+      currentRules = Array.isArray(settings.rules) ? settings.rules.slice() : [];
+      updateRulesSummary();
       setFeedback('Valores restablecidos.');
     } catch (e) {
       console.error('Error restableciendo', e);

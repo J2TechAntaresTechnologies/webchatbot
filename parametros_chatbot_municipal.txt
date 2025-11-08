@@ -1,0 +1,220 @@
+Parámetros del Chatbot Municipal — Guía Sencilla
+================================================
+
+Este documento explica, de forma simple, los parámetros del chatbot
+municipal, cómo afectan el flujo de decisión, e incluye diagramas ASCII y
+ejemplos claros para cada opción.
+
+Dónde se configuran
+-------------------
+- Archivo: chatbots/municipal/settings.json
+- API: GET/PUT /chatbots/municipal/settings (opcional)
+
+Vista rápida del flujo
+----------------------
+
+  [Inicio: POST /chat/message]
+                |
+        ¿channel es mar2/free?
+           /            \
+          Sí             No
+          |              |
+   +----------------+    v
+   |  LLM (con      |  [Clasificar intent]
+   |  pre_prompts)  |        |
+   +----------------+   ¿intent = handoff?
+                           /        \
+                          Sí        No
+                          |          |
+            [Derivar (texto de       v
+             atención humana)]   ¿features.use_rules?
+                 |                   /         \
+         Respuesta fallback        No           Sí
+                                             |
+                                     Intentar reglas
+                                     (custom + default
+                                      si enable_default_rules)
+                                     /        |        \
+                                match    sin match   sin match
+                                  |         |           |
+                           Respuesta    ¿use_generic   Seguir
+                           faq/fallback  _no_match?     v
+                                         /     \
+                                       Sí       No
+                                       |         |
+                        Respuesta genérica     Seguir
+                               |                v
+                            (fallback)     ¿features.use_rag?
+                                             /         \
+                                           No           Sí
+                                                       |
+                                                Buscar en RAG
+                                                (rag_threshold)
+                                                /         \
+                                             >=thr       <thr
+                                               |           |
+                                        Respuesta RAG     v
+                                                       ¿intent unknown y
+                                                       use_generic_no_match?
+                                                        /            \
+                                                      Sí              No
+                                                      |                |
+                                         Respuesta genérica           LLM
+                                               (fallback)     (con pre_prompts)
+
+Notas del flujo:
+- Reglas se intentan cuando el intent es faq/smalltalk y use_rules=true.
+- RAG sólo responde si la similitud supera rag_threshold.
+- El genérico (use_generic_no_match) puede activarse tras fallar reglas
+  (para faq/smalltalk) o al final si el intent es unknown.
+- En canal mar2/free siempre se usa LLM directo (aplican pre_prompts).
+
+Parámetro por parámetro (con ejemplos)
+--------------------------------------
+
+1) features.use_rules (bool)
+   Qué hace: activa el motor de reglas (FAQ/fallback). Se prueba primero para
+   intent faq/smalltalk.
+   Ejemplo ON:
+     Entrada: "Horario de atención"
+     Resultado: coincide con regla default → source="faq" (horarios).
+   Ejemplo OFF:
+     Entrada: "Horario de atención"
+     Resultado: salta reglas → intenta RAG; si no aplica, cae a LLM.
+
+2) features.enable_default_rules (bool)
+   Qué hace: incluye las reglas por defecto además de las personalizadas.
+   Ejemplo ON (default):
+     Entrada: "hola"
+     Resultado: saludo por regla default → source="fallback".
+   Ejemplo OFF:
+     Sólo correrán tus reglas en settings.rules. Si no hay match, seguirá el flujo
+     (genérico/RAG/LLM según el resto de toggles).
+
+3) rules (lista de reglas personalizadas)
+   Campos: enabled (bool), keywords (stems), response (texto), source ("faq"|"fallback").
+   Ejemplo (ya presente):
+     {
+       "enabled": true,
+       "keywords": ["impuestos"],
+       "response": "Podes pagar impuestos en www.impuestosvilla.com",
+       "source": "faq"
+     }
+   Efecto:
+     Entrada: "Necesito pagar mis impuestos"
+     → match con esta regla → source="faq" y respuesta personalizada.
+
+   Notas:
+     - El match es por subcadenas normalizadas (minúsculas, sin tildes).
+     - Por defecto se requiere que aparezcan todas las keywords (AND).
+
+4) features.use_rag (bool)
+   Qué hace: activa la búsqueda en la base de conocimientos (RAG) antes de LLM.
+   Ejemplo ON:
+     Entrada: "ordenanza de podas vigente"
+     Resultado: si similitud ≥ rag_threshold, devuelve texto del dataset → source="rag".
+   Ejemplo OFF:
+     La misma consulta iría a LLM (salvo que haya regla match o genérico).
+
+5) rag_threshold (float 0–1)
+   Qué hace: umbral mínimo de similitud para que RAG devuelva respuesta.
+   Ejemplo bajo (0.20):
+     Mayor recall: más respuestas de RAG, pero puede haber falsos positivos.
+   Ejemplo alto (0.45):
+     Mayor precisión: más consultas sin RAG → puede terminar en genérico/LLM.
+
+6) features.use_generic_no_match (bool)
+   Qué hace: habilita respuestas genéricas predefinidas cuando no hay match en
+   reglas o cuando el intent es unknown al final.
+   Ejemplo ON (tras fallar reglas):
+     Entrada: "Necesito un trámite poco común"
+     Resultado: responde con una plantilla de no_match_replies → source="fallback".
+   Ejemplo OFF:
+     En el mismo caso, seguirá a RAG o LLM en lugar de responder genérico.
+
+7) no_match_replies (lista) y no_match_pick ("first"|"random")
+   Qué hace: define los textos genéricos y cómo elegirlos.
+   Ejemplo:
+     no_match_replies = [
+       "No tengo una respuesta exacta... Escribí 'ayuda' para ver el menú.",
+       "No estoy entendiendo. Si escribís 'ayuda', muestro opciones."
+     ]
+     no_match_pick = "random"
+   Efecto: se elegirá una respuesta al azar para consultas sin match.
+
+8) pre_prompts (lista de instrucciones)
+   Qué hace: se inyectan antes del mensaje del usuario cuando se llama al LLM
+   (canal mar2/free o cuando el flujo llega a LLM).
+   Ejemplos de pre_prompts:
+     - "Usá un tono formal y respetuoso."
+     - "Respondé en no más de 2 oraciones."
+   Impacto:
+     Entrada: "Quiero sacar un turno"
+     Sin pre_prompts → respuesta directa.
+     Con pre_prompts → respuesta más breve/formal según las instrucciones.
+
+9) generation.temperature / top_p / max_tokens
+   Qué hacen: hiperparámetros del LLM. Afectan creatividad, diversidad y
+   longitud de la respuesta. No alteran el orden del flujo.
+   Ejemplos:
+     - temperature 0.3 (más conservador) vs 0.9 (más creativo).
+     - max_tokens 128 limita la longitud de salida.
+
+10) menu_suggestions (lista)
+   Qué hace: chips de sugerencias en la UI. No cambian la lógica del backend.
+   Ejemplo: {"label": "Ayuda", "message": "ayuda"}
+
+11) channel (por request) y bot_id
+   Qué hace: si channel es "mar2" o "free", se fuerza conversación libre:
+   salta reglas y RAG, va directo a LLM (sí aplica pre_prompts). Si es "web",
+   aplica el flujo completo.
+
+Diagrama reducido por toggle clave
+----------------------------------
+
+A) use_rules=true con enable_default_rules=true
+
+  (faq/smalltalk) -> [Reglas (custom + default)]
+        |           \- match -> respuesta faq/fallback
+        \- no match -> (según use_generic_no_match) genérico o seguir a RAG/LLM
+
+B) use_rag=true
+
+  (tras reglas/genérico) -> [RAG con rag_threshold]
+        |                   \- score >= thr -> respuesta RAG
+        \- score <  thr -> seguir a genérico (unknown) o LLM
+
+C) channel=mar2/free
+
+  Inicio -> [LLM con pre_prompts] (ignora reglas y RAG)
+
+Ejemplos completos (combinaciones típicas)
+-----------------------------------------
+
+1) Municipal por defecto (rules+RAG+genérico)
+   - use_rules=true, enable_default_rules=true, use_rag=true,
+     use_generic_no_match=true, rag_threshold=0.28
+   - "Horario de atención" -> regla default → faq
+   - "Ordenanza de podas"  -> RAG si supera 0.28; si no, genérico o LLM según intent.
+
+2) Sólo reglas (sin RAG)
+   - use_rules=true, use_rag=false, use_generic_no_match=true
+   - "Cómo pagar" -> faq (regla). "Capital de Marte" -> genérico (fallback).
+
+3) Sólo RAG (sin reglas)
+   - use_rules=false, use_rag=true
+   - "turnos" (sin regla) -> RAG si hay entrada; si no alcanza umbral -> LLM.
+
+4) LLM puro con estilo guiado
+   - use_rules=false, use_rag=false, pre_prompts=["Breve", "Formal"]
+   - Todas las consultas -> LLM con respuestas más breves y formales.
+
+Buenas prácticas rápidas
+------------------------
+- Empezar con rules ON (default) y sumar reglas personalizadas para FAQs locales.
+- Activar RAG cuando la base de conocimiento esté curada; ajustar rag_threshold
+  con pruebas reales (0.20–0.40 típico).
+- Usar genérico para consultas vagas si se quiere evitar LLM.
+- Mantener pre_prompts claros, sin contradicciones, y pocos.
+- Para reglas, usar stems cortos en keywords ("pag", "impuest", "turno").
+

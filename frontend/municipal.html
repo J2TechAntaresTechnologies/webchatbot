@@ -7,18 +7,23 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="chat-container">
-      <h1>Chatbot Municipal</h1>
-      <section id="chat-log" class="chat-log" aria-live="polite"></section>
-      <form id="chat-form" class="chat-form">
-        <label for="message">Escribí tu consulta</label>
-        <div class="input-group">
-          <input id="message" name="message" autocomplete="off" />
-          <button type="submit">Enviar</button>
-        </div>
-      </form>
-      <p class="hint">El formulario usa <code>fetch</code> hacia <code>/chat/message</code>.</p>
-    </main>
+    <!-- Layout con barra izquierda de sugerencias + chat principal -->
+    <div class="chat-layout">
+      <aside id="suggestions-panel" class="suggestions-panel" aria-label="Sugerencias"></aside>
+      <main class="chat-container chat-main">
+        <h1>Chatbot Municipal</h1>
+        <!-- Área de conversación (burbujas de mensajes) -->
+        <section id="chat-log" class="chat-log" aria-live="polite"></section>
+        <form id="chat-form" class="chat-form">
+          <label for="message">Escribí tu consulta</label>
+          <div class="input-group">
+            <input id="message" name="message" autocomplete="off" />
+            <button type="submit">Enviar</button>
+          </div>
+        </form>
+        <p class="hint">El formulario usa <code>fetch</code> hacia <code>/chat/message</code>.</p>
+      </main>
+    </div>
     <button id="exit-btn" type="button" class="fab-exit" aria-label="Salir al portal">Salir</button>
     <script defer src="app.js"></script>
   </body>

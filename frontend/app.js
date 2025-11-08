@@ -1,4 +1,5 @@
 // --- Tema activo desde localStorage ---
+// Aplica el tema activo leyendo variables de localStorage y setea CSS variables
 (function applyActiveTheme() {
   try {
     const THEME_KEY = 'webchatbot_themes';
@@ -31,13 +32,16 @@ const generateSessionId = () => {
   return `session-${Date.now()}-${randomSuffix}`;
 };
 
+// Identificador de sesión único para correlacionar mensajes
 const sessionId = generateSessionId();
+// Identificador de variante del bot (municipal guiado)
 const BOT_ID = "municipal";
 let currentController = null;
 const chatLog = document.getElementById("chat-log");
 const form = document.getElementById("chat-form");
 const input = document.getElementById("message");
 
+// Construye la URL base de la API (autodetecta :8000 en desarrollo o usa override)
 const API_BASE_URL = (() => {
   const override = typeof window !== "undefined" ? window.WEBCHATBOT_API_BASE_URL : null;
   if (typeof override === "string" && override.trim() !== "") {
@@ -54,14 +58,29 @@ const API_BASE_URL = (() => {
   return "";
 })();
 
+// Renderiza texto seguro y respeta saltos de línea con <br>
+// Escapa HTML y reemplaza saltos de línea por <br> para mostrar listas/menú
+function toSafeHtml(text) {
+  const s = String(text ?? "");
+  const escaped = s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+  return escaped.replace(/\n/g, "<br>");
+}
+
+// Inserta una burbuja de mensaje (usuario/bot) dentro del chat log
 const appendMessage = (role, text) => {
   const bubble = document.createElement("article");
   bubble.classList.add("message", role);
-  bubble.textContent = text;
+  bubble.innerHTML = toSafeHtml(text);
   chatLog.appendChild(bubble);
   chatLog.scrollTop = chatLog.scrollHeight;
 };
 
+// Habilita/deshabilita el formulario durante el envío
 const setSubmitting = (isSubmitting) => {
   form.querySelector("button").disabled = isSubmitting;
   input.disabled = isSubmitting;
@@ -137,8 +156,14 @@ appendMessage(
       });
       container.appendChild(chip);
     }
-    const formEl = document.getElementById("chat-form");
-    formEl.parentNode.insertBefore(container, formEl);
+    const side = document.getElementById("suggestions-panel");
+    if (side) {
+      side.innerHTML = "";
+      side.appendChild(container);
+    } else {
+      const formEl = document.getElementById("chat-form");
+      formEl.parentNode.insertBefore(container, formEl);
+    }
   } catch (e) {
     // silencioso
   }

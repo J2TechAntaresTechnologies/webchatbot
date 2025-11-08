@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<!-- saved from url=(0028)https://iasanti.netlify.app/ -->
+<html lang="en"><script type="module" src="chrome-extension://mleflnbfifngdmiknggikhfmjjmioofi/scripts/page.js"></script><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1">
+    <!----> <link rel="stylesheet" href="./SantIA_files/icon">
+      <link rel="stylesheet" href="./SantIA_files/css">
+      <style>
+        :root {
+          --df-messenger-default-font-family: 'Google Sans', 'Helvetica Neue',
+            sans-serif;
+          --df-messenger-default-font-size: 14px;
+          --df-messenger-default-font-color: #1f1f1f;
+          --df-messenger-default-secondary-font-color: #757575;
+          --df-messenger-default-icon-font-color: #444746;
+          --df-messenger-default-primary-color: #0b57d0;
+          --df-messenger-default-link-font-color: #0b57d0;
+          --df-messenger-default-link-decoration: underline;
+          --df-messenger-default-focus-color: #1e88e5;
+          --df-messenger-default-focus-color-contrast: #fff;
+          --df-messenger-default-border-color: #e0e0e0;
+          --df-messenger-default-border: 1px solid
+            var(--df-messenger-default-border-color);
+          --df-messenger-default-border-radius: 8px;
+          --df-messenger-default-chat-border-radius: 0;
+          --df-messenger-default-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.24);
+        }
+      </style><link rel="icon" href="https://iasanti.netlify.app/favicon.ico">
+    <link rel="manifest" href="https://iasanti.netlify.app/manifest.json">
+
+    <!-- 
+        Los metafields con la property "og: " (open graph) 
+      cuando compartimos el enlace de nuestro sitio 
+      son las que definen la manera que se muestra el cuadro en miniatura 
+      en whatsapp por ejemplo
+    -->
+    <meta property="og:site_name" content="SantIA">
+
+    <meta property="og:image" content="https://user-images.githubusercontent.com/59923978/167408693-868c0b67-9a7e-4cc6-b88a-adbe98b63e1d.png">
+    <meta property="og:image:width" content="64">
+    <meta property="og:image:height" content="64">
+
+    <meta property="og:title" content="SantIA | Municipalidad SN">
+    <meta property="og:description" content="Avatar SantIA">
+    <meta property="og:url" content="https://">
+
+    <title>SantIA</title>
+    <script type="module" crossorigin="" src="./SantIA_files/index.55ca64a5.js"></script>
+    <link rel="stylesheet" href="./SantIA_files/index.621c4c5d.css">
+  </head>
+  
+  <body>
+    <div id="root"><div class="w-screen h-screen"><div class=""><div><div class="call-container"><div style="display: flex; align-items: center;"><div class="call-text">¿Querés llamar<br>y hablar con SantIA?</div></div><div style="display: flex; align-items: center;"><div class="language-flags"><div style="position: relative; display: inline-block;"><button type="button" style="padding: 8px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; background: none; border: none;"><img src="./SantIA_files/ar.svg" style="display: inline-block; width: 1.5em; height: 1.5em; vertical-align: middle;"><span style="margin-left: 4px;">▼</span></button></div></div><button class="call-button"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>Llamar</button></div></div><df-messenger project-id="avatar-435310" agent-id="ff786bad-6b6f-4411-b8e9-7b2b1e0b9cf4" language-code="es" max-query-length="-1" location="global"><template shadowrootmode="open"><!---->
+      <div class="wrapper">
+        <!--?lit$061985093$--> <!--?lit$061985093$-->
+        <slot></slot>
+      </div>
+    </template><df-messenger-chat chat-title="" placeholder-text="¡Hola SantIA!" id="df-chat-wrapper"><template shadowrootmode="open"><!----> <div class="chat-wrapper" role="dialog" aria-label="">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <slot name="titlebar">
+      <!--
+          Use default titlebar, used if nothing else specified for the slot.
+        -->
+      <df-messenger-titlebar><template shadowrootmode="open"><!---->
+      <div class="titlebar-wrapper">
+        <div id="titlebar-title" class="focus-outline-contrast focus-outset focus-box" tabindex="0">
+          <!--?lit$061985093$--> <!--?lit$061985093$-->
+        </div>
+        <div class="actions">
+          <slot name="action"></slot>
+          <div class="offset"></div>
+        </div>
+      </div>
+    </template>
+        <slot name="titlebar-actions" slot="action"></slot>
+      </df-messenger-titlebar>
+    </slot>
+      <div class="message-list-wrapper">
+        <!--?lit$061985093$--> <div class="error ">
+      <!--?lit$061985093$-->Se ha producido un error. Vuelve a intentarlo.
+    </div> <!--?lit$061985093$--><df-messenger-message-list><template shadowrootmode="open"><!----> <style>
+        @import url(https://fonts.googleapis.com/icon?family=Material+Icons);
+      </style>
+      <div class="message-list-wrapper
+          ">
+        <!--?lit$061985093$--> <div id="message-list" aria-live="polite">
+      <div class="content">
+        <!--?lit$061985093$--><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Hola! ¿Cómo puedo ayudarte hoy?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->Me gustaría saber qué trámites puedo realizar.</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Qué bueno que preguntes! Para contarte bien, ¿vivís en San Nicolás o estás de visita? Y si vivís acá, ¿en qué barrio? Así te oriento mejor sobre los trámites más comunes en tu zona.</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->...</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¿Estás ahí? Si no, no te preocupes, podemos seguir cuando quieras. 😊</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->No, está bien. Me gustaría que te presentes.</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Dale! Soy SantIA, el avatar del intendente Santiago Passaglia. Estoy acá para charlar sobre San Nicolás, conocer tus experiencias en la ciudad y contarte sobre los servicios municipales. ¿De dónde sos?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->de San Nicolás también. Me gustaría saber con qué tecnologías estás integrado. ¿Cuáles son las bases y las aplicaciones que hacen a tu plataforma?</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>Uy, ¡qué pregunta técnica! Ahí me mataste, porque yo solo soy un avatar charlatán. Pero si querés saber más sobre eso, te puedo pasar el contacto de la Secretaría de Innovación y Modernización para que te cuenten bien. ¿Te parece?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->No, no, está bien. Me gustaría saber, no sabés por lo menos si sos un modelo de OpenIA</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>Mmm... la verdad que no tengo esa info. Pero lo que sí te puedo contar es que estoy para ayudarte con todo lo relacionado a San Nicolás. ¿Qué te gustaría saber de la ciudad? ¿Algún trámite, lugar para visitar o evento?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->Me gustaría conocer las especificaciones técnicas del chatbot que se llama Santiago. Santi-Ai Santiago</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Uf! Ahí sí que me agarraste en offside. Yo solo soy SantIA, el avatar del intendente. No sé mucho de esas cosas técnicas. Pero si querés, te puedo pasar el contacto de la gente de sistemas del municipio, seguro ellos saben más. ¿Te sirve?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->No, está bien. Me gustaría saber qué operaciones podemos realizar con vos.</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Ah, bueno, ahí sí te puedo ayudar! Podemos charlar sobre San Nicolás, recomendarte lugares para visitar, informarte sobre trámites municipales y hasta tomar reclamos si tenés algún problema en la ciudad. ¿Qué te gustaría hacer?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->Hola, me gustaría que te presentes</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Hola! Soy SantIA, el avatar del intendente. Estoy acá para conectar con vos y charlar sobre San Nicolás. ¿De dónde sos? ¿Qué te trae por acá hoy?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->...</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¿Todo bien por ahí? Si no respondés, no pasa nada, podemos seguir charlando cuando quieras. 😉</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->No, está bien me gustaría saber cuántas personas somos en esta conversación.</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>En esta conversación somos dos: vos y yo, SantIA. ¿En qué más te puedo ayudar hoy? ¿Tenés alguna consulta sobre la ciudad o algún trámite que quieras hacer?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->Me gustaría saber cuáles son las operaciones que podemos realizar.</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Ah, bueno! Podemos charlar sobre San Nicolás, recomendarte lugares para visitar, informarte sobre trámites municipales y hasta tomar reclamos si tenés algún problema en la ciudad. ¿Hay algo en particular que te interese?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Hola! ¿Cómo puedo ayudarte hoy?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->Hola, ¿cómo estás? Me gustaría que te presentes.</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Todo bien por acá, listo para charlar! Soy SantIA, el avatar del intendente de San Nicolás. ¿Vos sos de por acá o estás de visita? Contame qué te trae por estos pagos.</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->Estoy de visita, me gustaría saber qué trámites puedo realizar o qué información puedo obtener.</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Qué bueno que estés visitando San Nicolás! Te cuento, puedo darte información sobre trámites municipales, reclamos, turismo y servicios. ¿Hay algo en particular que te interese saber o algún trámite que quieras averiguar cómo hacer?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->Me gustaría saber cuáles son las tecnologías que te componen y si sos un modelo pre-entrenado de OpenIA, que está conectado con un servicio pago por mes.</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Esa es una muy buena pregunta! Pero la verdad es que no estoy autorizado a dar detalles técnicos sobre mi funcionamiento interno. Lo que sí te puedo decir es que estoy acá para ayudarte con todo lo relacionado a San Nicolás. ¿Hay algo más en lo que te pueda asistir?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->Sí, me he hecho una buena respuesta ahí. Sí, me gustaría saber dónde comer una buena carne al horno.</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Uf, qué rico una buena carne al horno! En San Nicolás tenés varias opciones para disfrutar de un buen asado. ¿Te gustaría que te recomiende algún lugar en particular? ¿O preferís que te diga algunas zonas donde podés encontrar restaurantes con carne al horno?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->Sí, sí, algún restaurante con carne al horno bueno.</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>A ver, para carne al horno, podrías probar en "El Muelle", que también tiene pescados, o en "Restaurante Avenida". Ambos son buenas opciones. ¿Te gustaría saber dónde quedan o algún otro detalle?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>Hello! How can I help you today?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->Hello, how are you? I want to know about the city and also I want to take a mistake, you know something to launch. Sorry.</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>I'm doing well, thanks for asking! It's always a good day in San Nicolás. Did you enjoy the meat at "El Muelle" or "Restaurante Avenida" as I recommended you last time?  </p>
+<p>Regarding taking a mistake, I'm not sure what you mean by that. Could you clarify what you'd like to do? Maybe you want to make a claim?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>Hello! How can I help you today?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->Hello, how are you? I'm just a tourist passing through this city, this beautiful city. I want to know where I can find a good, good bistec to launch.</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Qué bueno que estés disfrutando San Nicolás! ¿Probaste "El Muelle" o "Restaurante Avenida"? ¡Dicen que ahí la carne al horno es espectacular! ¿Te gustaría saber cómo llegar?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>Ciao! Come posso aiutarti oggi?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->Ciao, come va? Vuole trovare dove prendere, sai, qualcosa, qualche roba per mangiare?</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>Tutto bene, grazie! Certo, posso darti qualche consiglio. Stai cercando un posto per pranzare o cenare? Hai qualche preferenza in particolare, come tipo di cucina o fascia di prezzo?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry user">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-text-message class="single first-child last-child"><template shadowrootmode="open"><!----> <span class="visually-hidden"><!--?lit$061985093$-->Mi mensaje:</span>
+      <div class="message user-message">
+        <div style="white-space: pre-wrap;"><!--?lit$061985093$-->hola</div>
+      </div></template></df-text-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----><!----> <div class="entry bot">
+      <!--?lit$061985093$--> <!--?lit$061985093$--> <df-messenger-utterance class=""><template shadowrootmode="open"><!----> <!--?lit$061985093$--><!----> <div class="message-stack single"> <!--?lit$061985093$--><df-markdown-message class="single first-child last-child"><template shadowrootmode="open"><!----> <style>
+        @import url(https://www.gstatic.com/external_hosted/highlightjs/styles/googlecode.css);
+      </style>
+      <span class="visually-hidden">
+        <!--?lit$061985093$-->Mensaje del agente:
+      </span>
+      <div class="message bot-message markdown">
+        <!--?lit$061985093$--><p>¡Buenas tardes vecino! ¿En qué puedo ayudarte?</p>
+      </div></template></df-markdown-message> </div><!---->
+    <!--?lit$061985093$--><!--?--></template></df-messenger-utterance>
+    </div><!----> <!--?lit$061985093$-->
+      </div>
+    </div> <!--?lit$061985093$--> <div class="scroll-to-bottom-legacy
+          ">
+        <!--?lit$061985093$--> <button class="scroll-to-bottom-button focus-outline" aria-label="Ir al final">
+      <span class="material-icons icon">arrow_downward</span>
+      <span class="text"><!--?lit$061985093$-->Ir al final</span>
+    </button>
+      </div>
+      <div class="scroll-to-bottom ">
+        <!--?lit$061985093$--> <button class="scroll-to-bottom-button focus-outline" aria-label="Ir al final">
+      <span class="material-icons icon">arrow_downward</span>
+      <span class="text"><!--?lit$061985093$-->Ir al final</span>
+    </button>
+      </div>
+      </div></template></df-messenger-message-list>
+        <!--?lit$061985093$--><div class="function-call
+          ">
+      <button>
+        <!--?lit$061985093$-->Cancelar tarea
+      </button>
+    </div>
+      </div>
+      <df-messenger-user-input class="border-top"><template shadowrootmode="open"><!----> <style>
+        @import url(https://fonts.googleapis.com/icon?family=Material+Icons);
+      </style>
+      <div class="input-container">
+        <div class="popout-wrapper " aria-hidden="true">
+          <div class="popout error">
+            <span class="material-icons">warning_amber</span>
+            <div><!--?lit$061985093$--></div>
+          </div>
+        </div>
+        <div class="popout-wrapper
+            " aria-hidden="true">
+          <div class="popout warning">
+            <span class="material-icons">error_outline</span>
+            <div><!--?lit$061985093$-->Estás escribiendo una entrada larga, lo que puede generar un resultado sin coincidencias. Acorta tu consulta para recibir una respuesta más acertada.</div>
+          </div>
+        </div>
+        <div class="input-box-wrapper ">
+          <!--?lit$061985093$-->
+          <div class="input-wrapper ">
+            <!--?lit$061985093$--> <div class="input-element-wrapper">
+      <div class="input-content-wrapper">
+        <!--?lit$061985093$--> <textarea class="input-box" rows="1" type="text" aria-label="Hablar con agente" placeholder="¡Hola SantIA!" style="height: 19px;"></textarea>
+        <!-- Additional elements. -->
+        <!--?lit$061985093$--> <!--?lit$061985093$-->
+      </div>
+      <!--?lit$061985093$-->
+    </div>
+          </div>
+          <div class="send-icon-button-wrapper">
+            <button id="send-icon-button" class="focus-outline focus-inset
+                  " aria-label="Enviar" disabled="">
+              <svg xmlns="http://www.w3.org/2000/svg" id="send-icon">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                <path d="M0 0h24v24H0z" fill="none"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div></template></df-messenger-user-input> <!--?lit$061985093$--> <!--?lit$061985093$--><div class="demo-banner">
+      UI Demo. Not connected to an agent.
+    </div>
+    </div></template></df-messenger-chat></df-messenger><div class="videoWrapper"><video preload="auto" class="videoLoop" autoplay="" loop="" playsinline=""><source src="/assets/desktop_loop.f2c4d7d2.mp4" type="video/mp4">Tu navegador no soporta la etiqueta de video.</video><div id="superimposed-video-container"></div></div></div></div></div></div>
+    
+    <script src="./SantIA_files/df-messenger.js"></script>
+    <!-- <elevenlabs-convai agent-id="mB56WkIzfj35dy8oRgop"></elevenlabs-convai> -->
+    <!-- <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script> -->
+  
+
+</body></html>

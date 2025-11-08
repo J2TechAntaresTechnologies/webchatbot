@@ -7,8 +7,8 @@ Scripts y datasets para alimentar el chatbot con información oficial.
 - `documents/`: normativa municipal, comunicados (pendiente).
 - `embeddings/`: vectores generados para RAG con modelos reales (pendiente).
 
-## Formato de FAQs (JSON)
-- Archivo: `knowledge/faqs/municipal_faqs.json`.
+## Formato de FAQs (JSON/JSONC)
+- Archivo: `knowledge/faqs/municipal_faqs.json` (admite comentarios JSONC: `//` línea y bloque `/* ... */`).
 - Cada entrada debe incluir `uid`, `question`, `answer`, `tags` (lista de strings minúsculos):
 ```
 {
@@ -22,6 +22,7 @@ Scripts y datasets para alimentar el chatbot con información oficial.
   - `uid` único y estable (ej: `faq-005`).
   - Pregunta breve y concreta; respuesta clara con enlaces o rutas del portal.
   - `tags` en minúscula, 2–4 términos que faciliten el match léxico (sin tildes).
+  - Si usás utilidades como `jq`, recordá que no soportan comentarios: quitá comentarios antes de parsear.
 
 ## Cómo extender la base
 1. **Agregar nuevas FAQs**

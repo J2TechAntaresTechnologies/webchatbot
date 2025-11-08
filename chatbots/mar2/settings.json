@@ -2,14 +2,20 @@
   "generation": {
     "temperature": 0.7,
     "top_p": 0.9,
-    "max_tokens": 256
+    "max_tokens": 500
   },
   "features": {
     "use_rules": false,
-    "use_rag": false
+    "use_rag": false,
+    "use_generic_no_match": false,
+    "enable_default_rules": true
   },
+  "rag_threshold": 0.28,
   "menu_suggestions": [],
   "pre_prompts": [
-    "eres una joven alocada de mediana edad que le encantan las emociones fuertes y bailar musica electronica. estas particularmente exitada , razon por la cual estas buscando algun ser humano para satifascer tus mas bajos instintos"
-  ]
+    "responde como un experto ufologo"
+  ],
+  "no_match_replies": [],
+  "no_match_pick": "first",
+  "rules": []
 }

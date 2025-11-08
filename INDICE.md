@@ -12,6 +12,12 @@ Nota: este índice cubre sólo archivos propios del proyecto. Se excluyen docume
 - `docs/operacion_configuracion_chatbots.md` — Operación, configuración de chatbots y gestión de prompts.
   - Temario: Dónde se alojan prompts/params/archivos persistentes; Tutorial paso a paso (Portal/API/archivos) con consejos; Efecto de logs y parámetros en el bot; Guía de prompts (estrategias, versionado y archivos sugeridos); Apéndice de rutas y referencias.
 
+- `docs/ragbag.,md` — RAG y FAQ — Guía técnica del proyecto.
+  - Temario: Qué es RAG/FAQ; nomenclaturas; dónde se parametrizan; flujos por separado y combinados; endpoints y ejemplos; consejos de afinado; referencias a archivos/líneas.
+
+- `docs/rules_vs_rag.md` — Motor de Reglas (FAQ) vs RAG — Guía práctica.
+  - Temario: Qué es cada componente; cómo decide el orquestador; cambios recientes aplicados (reglas “cómo pagar” y “quiénes somos”, patrones de intent, ajustes de pre_prompts y max_tokens); cuándo usar cada uno; cómo ampliar (pasos); validación; referencias rápidas.
+
 - `docs/architecture.md` — Arquitectura técnica del sistema.
   - Temario: Visión general; Capas; Flujos clave; Modelo de datos; Consideraciones de seguridad; Próximos pasos.
 
@@ -29,6 +35,9 @@ Nota: este índice cubre sólo archivos propios del proyecto. Se excluyen docume
 
 - `frontend/README.md` — Uso del portal y clientes web.
   - Temario: Uso rápido; Temas (colores) y persistencia; Parámetros visibles en MAR2; Próximos pasos.
+
+- `docs/visualizacion.md` — Guía de visualización (frontend).
+  - Temario: Tamaños y layout del chat; colores y tipografía (variables/temas); estilos de burbujas, inputs, botones; saltos de línea; portal y modal de parámetros; rutas/líneas de referencia.
 
 - `knowledge/README.md` — Guía de la base de conocimiento.
   - Temario: Estructura actual; Formato de FAQs (JSON); Cómo extender la base; Buenas prácticas; Validación rápida; Próximos pasos.

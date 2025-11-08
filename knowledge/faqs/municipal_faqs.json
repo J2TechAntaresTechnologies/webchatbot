@@ -1,80 +1,174 @@
+/*
+Municipal FAQs Dataset — Explicación para desarrolladores
+=========================================================
+
+Resumen
+-------
+Este archivo contiene una lista de preguntas frecuentes (FAQs) que el
+componente RAG ligero del orquestador usa para recuperar respuestas por
+similitud léxica (bag‑of‑words + coseno). Está pensado como baseline
+rápido y simple para dominios municipales.
+
+Cómo lo usa el sistema
+----------------------
+- Carga e indexación: `services/orchestrator/rag.py::load_default_entries` lee este
+  JSON y construye `KnowledgeEntry(uid, question, answer, tags)`.
+- Búsqueda: `SimpleRagResponder.search()` concatena `question + tags`, vectoriza y
+  compara con la consulta. Si el mejor score ≥ threshold (p.ej. 0.28), devuelve `answer`.
+- Comentarios: este archivo admite comentarios (JSONC). El loader elimina
+  `// ...` y comentarios de bloque (formato barra-asterisco … asterisco-slash) antes de parsear. Herramientas estándar como `jq` no
+  soportan comentarios; si las usás, quitá comentarios previamente.
+
+Descripción de parámetros
+-------------------------
+- uid (string)
+  - Identificador único y estable de la entrada. No influye en el matching,
+    pero es clave para trazabilidad y mantenimiento. Ej.: "faq-007".
+- question (string)
+  - Pregunta canónica y concisa que un usuario formularía. Se vectoriza y
+    contribuye al score de similitud. Mantener lenguaje ciudadano.
+- answer (string)
+  - Respuesta oficial que verá el usuario si se recupera la entrada. No afecta
+    el score. Debe ser precisa y actualizada; incluir enlaces/rutas relevantes.
+- tags (array<string>)
+  - Etiquetas/kewyords que amplían la señal semántica. Se concatenan a la
+    pregunta para la vectorización. Recomendado 2–4, en minúscula y sin tildes.
+
+Buenas prácticas
+----------------
+- Evitar duplicados de `uid`. Mantener consistencia en `tags` (singular/plural).
+- Actualizar `answer` ante cambios normativos/procedimentales.
+- Validar el JSON (sin comentarios) en CI si es posible.
+*/
 [
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-001",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Dónde puedo consultar ordenanzas municipales?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "Las ordenanzas vigentes están disponibles en ordenanzas.municipio.gob y en el Centro de Documentación Ciudadana.",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["ordenanza", "documentacion", "normativa"]
   },
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-002",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Cómo solicito un permiso de poda?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "El permiso de poda se gestiona online en Trámites > Ambiente o de forma presencial en Atención Vecinal con turno previo.",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["ambiente", "permisos", "podas"]
   },
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-003",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Qué hago si quiero denunciar ruidos molestos?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "Podés registrar el reclamo en la app Municipalidad Cerca o comunicarte al 0800-123-4567 opción 3 para ruidos molestos.",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["ruidos", "reclamos", "convivencia"]
   },
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-004",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Cuál es la ordenanza vigente sobre podas?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "La ordenanza 3210/18 regula la poda urbana. Consultala completa en ordenanzas.municipio.gob o en Atención Vecinal.",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["ordenanza", "podas", "arbolado"]
   },
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-005",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Cómo pago mis impuestos municipales?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "Ingresá a Trámites > Pagos en la web oficial o acercate a las entidades adheridas con tu boleta. Se aceptan tarjetas, débito automático y pagos electrónicos.",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["pagos", "impuestos", "tasas"]
   },
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-006",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Cómo reporto una luminaria apagada?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "Cargá el reclamo en la app Municipalidad Cerca indicando la ubicación exacta o llamá al 0800-123-4567 opción 2 (Servicios).",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["luminarias", "reclamos", "servicios"]
   },
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-007",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Cuáles son los horarios de atención?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "La atención al público es de lunes a viernes de 9 a 17 hs y los sábados de 9 a 13 hs para trámites rápidos.",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["horarios", "atencion", "oficinas"]
   },
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-008",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Cómo solicito un certificado de libre deuda?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "Tramitá el certificado desde Trámites > Impuestos > Libre Deuda. Podés descargarlo en PDF una vez emitido.",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["certificados", "libre deuda", "impuestos"]
   },
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-009",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Cómo pido un turno para atención?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "Ingresá a turnos.municipio.gob para solicitar, consultar o reprogramar tu turno.",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["turnos", "tramites", "atencion"]
   },
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-010",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Cómo habilito un comercio?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "Iniciá el trámite en Trámites > Habilitaciones Comerciales. Consultá requisitos por rubro y subí la documentación desde la plataforma.",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["comercios", "habilitaciones", "permisos"]
   },
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-011",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Dónde consulto el seguimiento de un expediente?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "Accedé a Expedientes en la web del municipio con el número de expediente o tu DNI para ver su estado.",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["expedientes", "seguimiento", "tramites"]
   },
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-012",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Cómo denuncio basura en la vía pública?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "Registrá el reclamo en la app Municipalidad Cerca adjuntando una foto o llamá al 0800-123-4567 opción 2.",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["residuos", "reclamos", "ambiente"]
   },
   {
+    // uid — Identificador único y estable de la entrada (no influye en el score)
     "uid": "faq-013",
+    // question — Pregunta canónica y concisa (contribuye al score de similitud)
     "question": "¿Cuál es el cronograma de recolección de residuos?",
+    // answer — Respuesta oficial mostrada al usuario (no afecta el score)
     "answer": "Consultá el calendario por barrio en residuos.municipio.gob o en Atención Vecinal.",
+    // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["residuos", "recoleccion", "servicios"]
   }
 ]

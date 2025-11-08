@@ -1,0 +1,131 @@
+# RAG y FAQ — Guía técnica del proyecto
+
+Este documento resume cómo funcionan exactamente el motor de Reglas/FAQ y el RAG en el orquestador, qué significan las nomenclaturas, dónde se parametriza cada cosa y cómo operan por separado y combinadas.
+
+## 1) Qué es cada uno
+
+- FAQ (motor de reglas): respuestas fijas accionadas por coincidencia de palabras clave (match AND) sobre texto normalizado (minúsculas, sin tildes).
+  - Implementación: `services/orchestrator/rule_engine.py:12` (clase `Rule`) y reglas por defecto `DEFAULT_RULES` en `services/orchestrator/rule_engine.py:38`.
+- RAG (búsqueda): recuperación de una respuesta desde una base de conocimiento JSON/JSONC usando similitud léxica (bag‑of‑words normalizada + coseno).
+  - Implementación: `services/orchestrator/rag.py:24` (`SimpleRagResponder`) y carga de dataset `services/orchestrator/rag.py:158` (`load_default_entries`).
+  - El loader soporta comentarios en el JSON (JSONC) y los elimina antes de parsear.
+
+## 2) Nomenclaturas clave
+
+- Intents: `faq`, `rag`, `smalltalk`, `handoff`, `unknown` en `services/orchestrator/types.py:7`.
+  - Clasificador heurístico: `services/orchestrator/intent_classifier.py:38` (`DEFAULT_PATTERNS`).
+- Origen de respuesta (source): `faq`, `rag`, `llm`, `fallback` en `services/orchestrator/types.py:6` → devuelto en `ChatResponse.source` (`services/orchestrator/schema.py:13`).
+- Canal/bot: `channel` y `bot_id` en `ChatRequest` (`services/orchestrator/schema.py:6`).
+  - Canal `mar2`/`free` salta reglas y RAG (usa LLM directo) en `services/orchestrator/service.py:46`.
+- Toggles de features: `use_rules`, `use_rag`, `use_generic_no_match`, `enable_default_rules` en `services/chatbots/models.py` (persisten por bot).
+- Pre‑prompts: `pre_prompts` por bot, inyectados antes del mensaje cuando se llama al LLM (composición en `services/orchestrator/service.py:34`).
+
+## 3) Dónde se parametriza
+
+- Reglas/FAQ:
+  - Reglas por defecto: `services/orchestrator/rule_engine.py:38` (`DEFAULT_RULES` con `keywords`, `response`, `source`).
+  - Coincidencia: `Rule.matches()` (`services/orchestrator/rule_engine.py:20`) usa `normalize_text()` (`services/orchestrator/text_utils.py:8`).
+  - Reglas personalizables por bot: `BotSettings.rules` (estructura `RuleConfig` con `enabled`, `keywords`, `response`, `source`) en `services/chatbots/models.py`. El orquestador compone reglas efectivas: custom + (opcional) default según `features.enable_default_rules`.
+
+- RAG:
+  - Dataset por defecto: `knowledge/faqs/municipal_faqs.json` (admite comentarios, campos `uid`, `question`, `answer`, `tags`).
+  - Carga: `load_default_entries()` en `services/orchestrator/rag.py:158`.
+  - Umbral de similitud: `threshold=0.28` por defecto en `SimpleRagResponder` (`services/orchestrator/rag.py:27`).
+
+- Clasificador de intents:
+  - Patrones: `DEFAULT_PATTERNS` en `services/orchestrator/intent_classifier.py:38`.
+  - Se puede construir `IntentClassifier(patterns=...)` con presets propios.
+
+- Settings por bot (toggles y prompts):
+  - Modelo: `services/chatbots/models.py` (`BotSettings`), incluye `generation`, `features`, `menu_suggestions`, `pre_prompts`, `no_match_replies`, `no_match_pick`, `rules`.
+  - Persistencia: `chatbots/<id>/settings.json` vía API (`services/chatbots/router.py:14`).
+  - Defaults por canal/bot: `services/chatbots/models.py` (`defaults_for`).
+
+## 4) Cómo trabajan por separado
+
+- Solo FAQ (use_rules=true, use_rag=false):
+  - Flujo: clasifica → si `intent ∈ {faq, smalltalk}` prueba reglas → si hay match responde con `source` `faq` o `fallback` → si no hay match, cae a LLM (`source=llm`).
+  - Código: gating en `services/orchestrator/service.py:66` y lógica en `_try_rules()` (`services/orchestrator/service.py:88`).
+
+- Solo RAG (use_rules=false, use_rag=true):
+  - Flujo: clasifica → si `intent == rag` busca en base (coseno) → si score ≥ threshold responde `source=rag` → si no, LLM.
+  - Código: gating en `services/orchestrator/service.py:69` y lógica en `_try_rag()` (`services/orchestrator/service.py:99`).
+
+## 5) Cómo trabajan combinadas (orden y prioridades)
+
+Orden de decisión en `ChatOrchestrator.respond()` (`services/orchestrator/service.py:28`):
+
+1. Canal libre `mar2`/`free` → LLM directo con pre‑prompts (si existen) (`services/orchestrator/service.py:46`).
+2. Si `intent == handoff` → responde derivación (`source=fallback`, `escalated=true`) (`services/orchestrator/service.py:58`).
+3. Si `use_rules` y `intent ∈ {faq, smalltalk}` → prueba reglas (`services/orchestrator/service.py:66`). Si matchea, responde y TERMINA.
+4. Si no respondió y `use_rag` y `intent == rag` → prueba RAG (`services/orchestrator/service.py:69`). Si supera umbral, responde y TERMINA.
+5. Si nada aplica → si `use_generic_no_match=true` responde con una genérica (`source=fallback`); si no, LLM con pre‑prompts (`services/orchestrator/service.py`).
+
+Notas:
+- RAG no se salta: la respuesta genérica se evalúa después de reglas y (si corresponde por intent) RAG. Si `use_rag=true` y el intent es `rag`, primero intenta RAG; sólo si no supera umbral aplica genérico/LLM.
+
+## 6) Endpoints y ajustes
+
+- Chat:
+  - `POST /chat/message` → `services/orchestrator/router.py:11`, respuesta `ChatResponse` con `source` y `escalated`.
+
+- Settings por bot:
+  - `GET  /chatbots/{id}/settings?channel=web` → lee o defaults.
+  - `PUT  /chatbots/{id}/settings` → guarda `chatbots/<id>/settings.json`.
+  - `POST /chatbots/{id}/settings/reset?channel=web` → restablece defaults.
+  - Implementación: `services/chatbots/router.py:14` y modelos en `services/chatbots/models.py:34`.
+
+Ejemplos (curl):
+
+```bash
+curl -sS "http://127.0.0.1:8000/chatbots/municipal/settings?channel=web" | jq .
+
+curl -sS -X PUT \
+  "http://127.0.0.1:8000/chatbots/municipal/settings" \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "generation": {"temperature": 0.7, "top_p": 0.9, "max_tokens": 256},
+        "features": {
+          "use_rules": true,
+          "use_rag": true,
+          "use_generic_no_match": true,
+          "enable_default_rules": true
+        },
+        "menu_suggestions": [],
+        "pre_prompts": ["Responde con tono claro y conciso"],
+        "no_match_replies": [
+          "No pude comprender tu consulta. Escribí 'ayuda' para ver opciones o contame en pocas palabras qué necesitás.",
+          "No entiendo bien. ¿Podés reformular en 5–7 palabras?"
+        ],
+        "no_match_pick": "random",
+        "rules": [
+          {"enabled": true, "keywords": ["turno", "reprogram"], "response": "Podés reprogramar tu turno en turnos.municipio.gob.", "source": "faq"}
+        ]
+      }' | jq .
+
+curl -sS -X POST "http://127.0.0.1:8000/chatbots/municipal/settings/reset?channel=web" | jq .
+```
+
+## 7) Consejos prácticos de afinado
+
+- Alinear clasificación, reglas y dataset:
+  - Reglas: ampliar `DEFAULT_RULES` (`services/orchestrator/rule_engine.py:38`) con keywords raíz (p.ej., `pag`, `impuest`) para mayor recall.
+  - Clasificador: ajustar `DEFAULT_PATTERNS` (`services/orchestrator/intent_classifier.py:38`) para que consultas de normativa vayan a `rag` y no a `faq`.
+  - Dataset RAG: enriquecer `knowledge/faqs/municipal_faqs.json` y `tags` para mejorar recall; subir el `threshold` si hay falsos positivos.
+
+- Toggles según variante:
+  - Municipal (informativo): `use_rules=true`, `use_rag=true`; `temperature` 0.6–0.8; `top_p` 0.8–0.95.
+  - MAR2/Libre (creativo): `use_rules=false`, `use_rag=false`; `temperature` 0.8–1.1; `top_p` 0.9–1.0.
+
+- Pre‑prompts:
+  - Definir estilo/rol/políticas (no inventar; priorizar fuentes oficiales; derivar a humano si falta info). Se inyectan como lista antes del mensaje del usuario.
+
+## 8) Referencias rápidas (archivos)
+
+- Orquestador (flujo): `services/orchestrator/service.py:28`.
+- Motor de reglas: `services/orchestrator/rule_engine.py:12` y `services/orchestrator/rule_engine.py:38`.
+- RAG ligero: `services/orchestrator/rag.py:24` y `services/orchestrator/rag.py:65`.
+- Clasificador de intents: `services/orchestrator/intent_classifier.py:38`.
+- Tipos (source/intents): `services/orchestrator/types.py:6`.
+- Normalización de texto: `services/orchestrator/text_utils.py:8`.
+- Settings por bot: `services/chatbots/models.py:34` y persistencia en `chatbots/<id>/settings.json`.

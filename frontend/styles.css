@@ -1,33 +1,110 @@
 :root {
+  /* Modo de render del navegador (tema oscuro) */
   color-scheme: dark;
+  /* Familia tipográfica base usada en toda la UI */
   --font-family: "Segoe UI", system-ui, sans-serif;
+  /* Tamaño de fuente base de la UI */
   --font-size: 16px;
+  /* Fondo principal del body (degradado radial) */
   --bg-main: radial-gradient(circle at 20% 10%, #152132, #0f172a 55%, #0b1120);
+  /* Color de superficie principal (paneles) con transparencia */
   --surface: rgba(30, 41, 59, 0.9);
+  /* Variante más intensa de superficie (bordes/acentos) */
   --surface-strong: #1c2a44;
+  /* Variante suave de superficie (fondos secundarios) */
   --surface-soft: #273955;
+  /* Superficie clara para burbuja del bot */
   --surface-bright: #324768;
+  /* Color de acento (degradados y foco) */
   --accent: #38bdf8;
+  /* Color de acento fuerte (degradados) */
   --accent-strong: #6366f1;
+  /* Texto principal (alto contraste) */
   --text-primary: #f8fafc;
+  /* Texto secundario (bajo contraste) */
   --text-secondary: #cbd5f5;
+  /* Color de borde sutil para contornos y chips */
   --border-subtle: rgba(148, 163, 184, 0.35);
 }
 
+/* Layout con barra lateral de sugerencias */
+.chat-layout {
+  display: grid;
+  /* Ancho de la barra lateral (sugerencias) y del área principal */
+  /* Primer valor: ancho fijo de la columna izquierda (sugerencias). */
+  /* Cambiar 220px → 260px/280px o usar un valor flexible: minmax(240px, 28%) 1fr */
+  grid-template-columns: 220px 1fr;
+  gap: 1rem;
+  width: min(960px, 95vw);
+  margin: 32px auto;
+}
+
+.chat-main {
+  width: auto; /* toma el espacio restante del grid */
+}
+
+.suggestions-panel {
+  border: 1px solid var(--border-subtle); /* Contorno del panel lateral */
+  border-radius: 12px;                    /* Esquinas redondeadas del panel */
+  padding: 0.8rem;                        /* Separación interna de contenidos */
+  background: rgba(17, 25, 40, 0.6);      /* Fondo semitransparente (tema oscuro) */
+  color: var(--text-primary);             /* Color de texto dentro del panel */
+  max-height: 70vh;                       /* Alto máximo relativo a la pantalla (ajustar para ver más/menos items) */
+  overflow-y: auto;                       /* Al superar el alto máximo, aparece scroll vertical */
+}
+
+.suggestions-panel::before {
+  content: 'Sugerencias';                /* Título fijo del panel (puede cambiarse) */
+  display: block;                         /* Ocupa toda la línea encima de los chips */
+  color: var(--text-secondary);           /* Color más tenue para título */
+  font-size: 0.9rem;                      /* Tamaño del título */
+  margin-bottom: 0.5rem;                  /* Separación respecto del primer chip */
+}
+
+.suggestions-panel .suggestion-chip {
+  display: block;                         /* Cada chip ocupa una fila completa */
+  width: 100%;                            /* Fuerza a que el chip use todo el ancho disponible */
+  text-align: left;                       /* Alinea el texto a la izquierda dentro del chip */
+  margin: 0 0 0.4rem 0;                   /* Separación inferior entre chips */
+  /* Para dos columnas: cambiar a inline-block y dar ancho, p.ej.: */
+  /* display: inline-block; width: 48%; margin: 0 2% 0.4rem 0; */
+}
+
+/* Responsive: apilar en móviles */
+@media (max-width: 720px) {
+  .chat-layout {
+    grid-template-columns: 1fr;           /* En móviles apila: panel lateral arriba/abajo del chat */
+  }
+  .suggestions-panel {
+    max-height: none;                     /* Sin límite de altura en móvil (puede agregarse si hace falta) */
+    order: 2;                             /* Mueve el panel debajo del chat en el flujo */
+  }
+}
+
 body {
+  /* Quita márgenes por defecto del navegador */
   margin: 0;
+  /* Centra el contenedor del chat en la pantalla */
   display: flex;
+  /* Alto mínimo a pantalla completa */
   min-height: 100vh;
+  /* Fondo global (usa variable --bg-main) */
   background: var(--bg-main);
+  /* Centrado horizontal del .chat-container */
   justify-content: center;
+  /* Centrado vertical del .chat-container */
   align-items: center;
+  /* Color de texto por defecto */
   color: var(--text-primary);
+  /* Fuente base */
   font-family: var(--font-family, "Segoe UI", system-ui, sans-serif);
+  /* Tamaño de fuente base */
   font-size: var(--font-size, 16px);
 }
 
 /* Barra superior en el portal */
 .topbar {
+  /* Barra superior del portal con título y controles */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -41,6 +118,7 @@ body {
 }
 
 .theme-select {
+  /* Selector de temas (portal) */
   background: rgba(49, 65, 94, 0.25);
   color: var(--text-primary);
   border: 1px solid var(--border-subtle);
@@ -54,15 +132,24 @@ body {
 }
 
 .chat-container {
-  width: min(640px, 95vw);
+  /* Ancho máximo del cuadro de chat y límite por viewport */
+  width: min(960px, 95vw);
+  /* Subir 960px si necesitás más ancho total de la vista de chat */
+  /* Fondo del panel principal */
   background: linear-gradient(160deg, var(--surface), rgba(15, 23, 42, 0.82));
+  /* Relleno interno del panel */
   padding: 1.75rem;
+  /* Esquinas redondeadas del panel */
   border-radius: 16px;
+  /* Efecto de desenfoque del fondo (glassmorphism) */
   backdrop-filter: blur(10px);
+  /* Sombra del contenedor */
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+  /* Layout vertical interno */
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  /* Borde sutil del contenedor */
   border: 1px solid rgba(148, 163, 184, 0.1);
 }
 
@@ -74,44 +161,69 @@ body {
 }
 
 .chat-log {
+  /* Ocupa el espacio disponible dentro del contenedor */
   flex: 1;
+  /* Alto mínimo del área de mensajes */
   min-height: 280px;
+  /* Alto máximo (luego scroll) */
   max-height: 420px;
+  /* Aumentar este valor muestra más historial antes de que aparezca el scroll */
+  /* Habilita scroll vertical */
   overflow-y: auto;
+  /* Borde de la lista de mensajes */
   border: 1px solid var(--border-subtle);
+  /* Esquinas redondeadas */
   border-radius: 12px;
+  /* Relleno interno */
   padding: 1rem;
+  /* Layout de columna para las burbujas */
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  /* Fondo del área de mensajes */
   background: linear-gradient(150deg, rgba(49, 65, 94, 0.15), rgba(15, 23, 42, 0.65));
 
   color: var(--text-primary);
 }
 
 .message {
+  /* Relleno de las burbujas */
   padding: 0.85rem 1.1rem;
+  /* Esquinas redondeadas de cada burbuja */
   border-radius: 12px;
-  max-width: 80%;
+  /* Ancho máximo relativo a la caja de chat */
+  max-width: 95%;
+  /* Altura de línea legible */
   line-height: 1.5;
+  /* Preserva saltos de línea (\n) y espacios razonablemente */
+  white-space: pre-wrap;
   color: inherit;
 }
 
 .message.user {
+  /* Alinea la burbuja del usuario a la derecha */
   margin-left: auto;
+  /* Degradado de fondo para el usuario */
   background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+  /* Color de texto en burbuja del usuario */
   color: #07101f;
+  /* Peso de fuente para destacar */
   font-weight: 500;
+  /* Sombra sutil de la burbuja */
   box-shadow: 0 12px 24px rgba(56, 189, 248, 0.25);
 }
 
 .message.bot {
+  /* Fondo de la burbuja del bot */
   background: var(--surface-bright);
+  /* Borde sutil de la burbuja del bot */
   border: 1px solid rgba(148, 163, 184, 0.25);
+  /* Sombra de la burbuja del bot */
   box-shadow: 0 12px 26px rgba(12, 20, 33, 0.5);
 }
 
 .chat-form {
+  /* Layout vertical del formulario de envío */
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -128,51 +240,76 @@ body {
 }
 
 input {
+  /* El input ocupa el ancho restante al lado del botón */
   flex: 1;
+  /* Borde del campo de texto */
   border: 1px solid var(--border-subtle);
+  /* Esquinas redondeadas del input */
   border-radius: 10px;
+  /* Relleno interno del input */
   padding: 0.8rem 1rem;
+  /* Tamaño de fuente dentro del input */
   font-size: 1rem;
+  /* Fondo del input (semítransparente) */
   background: rgba(17, 25, 40, 0.8);
+  /* Color del texto del input */
   color: var(--text-primary);
+  /* Transiciones para interacción */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 input:focus {
+  /* Quita borde nativo al enfocar */
   outline: none;
+  /* Color de borde al enfocar (usa acento) */
   border-color: var(--accent);
+  /* Halo de foco accesible */
   box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
 }
 
 button {
+  /* Sin borde nativo del botón */
   border: none;
+  /* Degradado de fondo del botón */
   background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+  /* Color del texto del botón */
   color: var(--text-primary);
+  /* Esquinas redondeadas del botón */
   border-radius: 10px;
+  /* Relleno interno del botón */
   padding: 0.8rem 1.5rem;
+  /* Cursor de mano al pasar */
   cursor: pointer;
+  /* Peso de fuente del botón */
   font-weight: 600;
+  /* Animaciones de hover/active */
   transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.2s ease;
 }
 
 button:hover:not(:disabled) {
+  /* Levanta levemente el botón al pasar el cursor */
   transform: translateY(-1px);
+  /* Aumenta la sombra para dar profundidad */
   box-shadow: 0 14px 30px rgba(99, 102, 241, 0.35);
+  /* Sube el brillo en hover */
   filter: brightness(1.05);
 }
 
 button:disabled {
+  /* Apariencia de deshabilitado */
   opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
 }
 
 .hint {
+  /* Texto auxiliar (indicaciones y notas) */
   font-size: 0.85rem;
   color: var(--text-secondary);
 }
 
 .config-summary {
+  /* Caja resumen de parámetros (MAR2) */
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   background: rgba(49, 65, 94, 0.25);
@@ -181,6 +318,7 @@ button:disabled {
 }
 
 .config-summary .kv {
+  /* Pares clave/valor del resumen */
   display: inline-block;
   margin-right: 1rem;
   font-size: 0.95rem;
@@ -189,20 +327,24 @@ button:disabled {
 .config-summary .kv b { color: var(--text-secondary); }
 
 .config-summary .chips {
+  /* Contenedor de chips de pre-prompts */
   margin-top: 0.4rem;
 }
 
 .chat-log::-webkit-scrollbar {
+  /* Ancho de la barra de scroll del chat (WebKit) */
   width: 6px;
 }
 
 .chat-log::-webkit-scrollbar-thumb {
+  /* Estilo del deslizador de scroll (WebKit) */
   background: rgba(148, 163, 184, 0.3);
   border-radius: 999px;
 }
 
 /* Portal: enlaces como botones */
 .btn-link {
+  /* Estilo de enlace como botón (Portal) */
   display: inline-block;
   padding: 0.4rem 0.8rem;
   border-radius: 8px;
@@ -213,11 +355,13 @@ button:disabled {
 }
 
 .btn-secondary {
+  /* Variante secundaria de botón (grises) */
   background: var(--surface-soft);
 }
 
 /* Modal de configuración */
 .modal-backdrop {
+  /* Capa oscura detrás de modales */
   position: fixed;
   inset: 0;
   background: rgba(2, 6, 23, 0.65);
@@ -229,19 +373,30 @@ button:disabled {
 
 /* Asegura que el atributo hidden siempre oculte el modal, incluso si hay display definido */
 .modal-backdrop[hidden] {
+  /* Fuerza ocultamiento del modal cuando tiene atributo hidden */
   display: none !important;
 }
 
 .modal {
+  /* Ancho responsivo del cuadro modal */
   width: min(680px, 92vw);
+  /* Fondo del modal */
   background: linear-gradient(160deg, var(--surface), rgba(15, 23, 42, 0.9));
+  /* Borde sutil del modal */
   border: 1px solid rgba(148, 163, 184, 0.15);
+  /* Esquinas redondeadas del modal */
   border-radius: 14px;
+  /* Relleno interno del modal */
   padding: 1rem 1.2rem;
+  /* Sombra del modal */
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.55);
+  /* Limitar altura y permitir scroll interno para pantallas pequeñas */
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-header {
+  /* Cabecera del modal (título y botones) */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -249,19 +404,47 @@ button:disabled {
 }
 
 .settings-form fieldset {
+  /* Marcos de secciones dentro del modal */
   border: 1px solid rgba(148, 163, 184, 0.25);
   border-radius: 10px;
   margin: 0 0 0.9rem 0;
   padding: 0.8rem;
 }
 
+/* Asegurar que formularios largos no desborden la pantalla */
+.settings-form {
+  max-height: 70vh;
+  overflow: auto;
+}
+
+/* Cuerpos de ayuda extensos con scroll propio */
+.help-body {
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+/* Scrollbar para los modales (coherente con chat-log) */
+.modal::-webkit-scrollbar,
+.help-body::-webkit-scrollbar,
+.settings-form::-webkit-scrollbar {
+  width: 6px;
+}
+.modal::-webkit-scrollbar-thumb,
+.help-body::-webkit-scrollbar-thumb,
+.settings-form::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 999px;
+}
+
 .theme-grid {
+  /* Grilla de controles de tema (colores) */
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.6rem;
 }
 
 .settings-form label {
+  /* Disposición de etiquetas y controles en línea */
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -269,30 +452,117 @@ button:disabled {
 }
 
 .modal-actions {
+  /* Contenedor de botones del modal */
   display: flex;
   gap: 0.6rem;
   justify-content: flex-end;
 }
 
 .suggestions-editor .row {
+  /* Fila de editor de sugerencias (menú/pre-prompts) */
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr auto;    /* Ancho relativo: etiqueta | mensaje | botón borrar */
+  /* Dar más espacio al mensaje (ej.: 2fr 3fr auto) o hacer el botón más angosto */
   gap: 0.5rem;
   margin: 0.4rem 0;
 }
 
-.suggestion-chip {
-  display: inline-block;
+/* (Revert) estilos avanzados de editores específicos del Municipal removidos */
+
+.rules-editor .rule-row {
+  /* Contenedor de cada regla personalizada */
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 10px;
+  padding: 0.6rem;
+  margin: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rules-editor .rule-row-header label {
+  width: auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.rules-editor .rule-row-header select {
+  width: auto;
+}
+
+.rules-editor .rule-row-header input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--accent);
+}
+
+.rules-editor .rule-row-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rules-editor label {
+  /* Etiquetas en columnas dentro del editor de reglas */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.rules-editor textarea,
+.rules-editor input,
+.rules-editor select {
+  width: 100%;
   border: 1px solid var(--border-subtle);
-  border-radius: 999px;
-  padding: 0.2rem 0.6rem;
-  margin-right: 0.3rem;
-  background: rgba(49, 65, 94, 0.25);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  background: rgba(17, 25, 40, 0.7);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.rules-editor textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.rules-editor .rule-remove {
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.rules-editor .rule-remove:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.suggestion-chip {
+  /* Chip de sugerencia de mensaje */
+  display: inline-block;
+  border: 1px solid var(--border-subtle); /* Contorno del chip */
+  border-radius: 999px;                   /* Forma redondeada tipo pastilla */
+  padding: 0.2rem 0.6rem;                 /* Aumentar padding → chips más grandes */
+  margin-right: 0.3rem;                   /* Separación horizontal entre chips (cuando van en fila) */
+  background: rgba(49, 65, 94, 0.25);     /* Fondo semitransparente acorde al tema */
   cursor: pointer;
 }
 
 /* Botón flotante de salida */
 .fab-exit {
+  /* Botón flotante de salida (esquina inferior derecha) */
   position: fixed;
   right: 24px;
   bottom: 24px;
@@ -307,5 +577,7 @@ button:disabled {
 }
 
 .fab-exit:hover {
+  /* Ligeramente más brillante al pasar el cursor */
   filter: brightness(1.05);
 }
+:root {

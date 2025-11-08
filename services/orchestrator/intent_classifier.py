@@ -38,11 +38,15 @@ class IntentClassifier:
 DEFAULT_PATTERNS: Sequence[IntentPattern] = (
     IntentPattern(intent="faq", keywords=("horario", "atencion"), confidence=0.9),
     IntentPattern(intent="faq", keywords=("pag", "impuest"), confidence=0.8),
+    IntentPattern(intent="faq", keywords=("como", "pag"), confidence=0.7),
+    IntentPattern(intent="faq", keywords=("quien", "somos"), confidence=0.7),
+    IntentPattern(intent="faq", keywords=("quien", "son"), confidence=0.7),
     IntentPattern(intent="faq", keywords=("turno",), confidence=0.75),
     IntentPattern(intent="faq", keywords=("contacto",), confidence=0.75),
     IntentPattern(intent="faq", keywords=("reclamo",), confidence=0.7),
     IntentPattern(intent="smalltalk", keywords=("hola",), confidence=0.5),
     IntentPattern(intent="smalltalk", keywords=("ayuda",), confidence=0.5),
+    IntentPattern(intent="smalltalk", keywords=("menu",), confidence=0.5),
     IntentPattern(intent="smalltalk", keywords=("gracia",), confidence=0.4),
     IntentPattern(intent="smalltalk", keywords=("opcion",), confidence=0.4),
     IntentPattern(intent="smalltalk", keywords=("1",), confidence=0.3),
@@ -52,6 +56,9 @@ DEFAULT_PATTERNS: Sequence[IntentPattern] = (
     IntentPattern(intent="handoff", keywords=("hablar", "agente"), confidence=0.8),
     IntentPattern(intent="rag", keywords=("ordenanza",), confidence=0.6),
     IntentPattern(intent="rag", keywords=("normativa",), confidence=0.6),
+    # Patrones RAG adicionales (stems) para habilitar búsquedas sobre permisos de poda/ambiente
+    IntentPattern(intent="rag", keywords=("ambiente", "permis"), confidence=0.65),
+    IntentPattern(intent="rag", keywords=("poda",), confidence=0.65),
 )
 
 # ================================================================

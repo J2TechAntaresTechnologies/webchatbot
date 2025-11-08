@@ -3,15 +3,16 @@
 from __future__ import annotations
 
 from services.orchestrator import schema
+import random
 from services.llm_adapter.client import LLMClient
 from services.orchestrator.intent_classifier import IntentClassifier
-from services.orchestrator.rule_engine import RuleBasedResponder
+from services.orchestrator.rule_engine import RuleBasedResponder, Rule
 from services.orchestrator.types import (
     IntentPrediction,
     RagResponderProtocol,
     ResponseSource,
 )
-from services.orchestrator.rag import SimpleRagResponder, load_default_entries
+from services.orchestrator.rag import SimpleRagResponder, load_default_entries, KnowledgeEntry
 from services.chatbots.models import load_settings
 
 
@@ -23,6 +24,8 @@ class ChatOrchestrator:
         self._classifier = IntentClassifier()
         self._llm = LLMClient()
         self._rag: RagResponderProtocol | None = None
+        self._rag_entries: list[KnowledgeEntry] | None = None
+        self._rag_cache: dict[float, RagResponderProtocol] = {}
         self._bootstrap_rag()
 
     async def respond(self, request: schema.ChatRequest) -> schema.ChatResponse:
@@ -63,11 +66,31 @@ class ChatOrchestrator:
                 escalated=True,
             )
 
-        if settings.features.use_rules and (reply := await self._try_rules(request, prediction)):
+        # Reglas: si hay match responde; si no hay match y está activado
+        # features.use_generic_no_match, devuelve un mensaje genérico orientando
+        # a reformular (sin pasar por RAG/LLM para intents faq/smalltalk).
+        if settings.features.use_rules and (reply := await self._try_rules(request, prediction, settings)):
             return reply
 
-        if settings.features.use_rag and (reply := await self._try_rag(request, prediction)):
+        if settings.features.use_rag and (reply := await self._try_rag(request, prediction, settings)):
             return reply
+
+        # Si no hubo match y el intent es "unknown", y está habilitada la
+        # respuesta genérica, devolverla (evita ir al LLM para entradas vagas).
+        if getattr(settings.features, "use_generic_no_match", False) and prediction.intent == "unknown":
+            replies = [
+                p.strip()
+                for p in (getattr(settings, "no_match_replies", []) or [])
+                if isinstance(p, str) and p.strip()
+            ]
+            if replies:
+                pick = getattr(settings, "no_match_pick", "first")
+                text = random.choice(replies) if pick == "random" else replies[0]
+            else:
+                text = (
+                    "No pude comprender tu consulta. Intentá reformularla en pocas palabras o escribí 'ayuda' para ver opciones."
+                )
+            return self._build_response(request, text, "fallback")
 
         return await self._fallback(request, settings, compose_with_preprompts)
 
@@ -86,22 +109,75 @@ class ChatOrchestrator:
         )
 
     async def _try_rules(
-        self, request: schema.ChatRequest, prediction: IntentPrediction
+        self, request: schema.ChatRequest, prediction: IntentPrediction, settings=None
     ) -> schema.ChatResponse | None:
         if prediction.intent not in {"faq", "smalltalk"}:
             return None
-        match = await self._rules.get_response(request.message)
+        # Si hay settings, combinar reglas por defecto con personalizadas según enable_default_rules.
+        responder = self._rules
+        if settings is not None:
+            try:
+                custom_rules_data = getattr(settings, "rules", []) or []
+                custom_rules: list[Rule] = []
+                for rc in custom_rules_data:
+                    # rc puede ser dict o RuleConfig; acceder de forma segura
+                    keywords = list(getattr(rc, "keywords", []) or (rc.get("keywords", []) if isinstance(rc, dict) else []))
+                    response = getattr(rc, "response", None) if not isinstance(rc, dict) else rc.get("response")
+                    source = getattr(rc, "source", "faq") if not isinstance(rc, dict) else rc.get("source", "faq")
+                    enabled = getattr(rc, "enabled", True) if not isinstance(rc, dict) else rc.get("enabled", True)
+                    if enabled and keywords and isinstance(response, str) and response.strip():
+                        custom_rules.append(Rule(keywords=tuple(keywords), response=response.strip(), source=("fallback" if source == "fallback" else "faq")))
+                rules: list[Rule] = []
+                # Priorizar reglas personalizadas (más específicas) por delante de las default
+                rules.extend(custom_rules)
+                if getattr(settings.features, "enable_default_rules", True):
+                    rules.extend(self._rules.rules)
+                if rules:
+                    responder = RuleBasedResponder(rules)
+            except Exception:
+                # En caso de estructura inesperada, continuar con defaults
+                responder = self._rules
+        match = await responder.get_response(request.message)
         if not match:
+            # Si no hay coincidencia de reglas y el bot lo permite, responder
+            # con un genérico de “no comprendo; intentá reformular/ayuda”.
+            if settings is not None and getattr(settings.features, "use_generic_no_match", False):
+                replies = [
+                    p.strip()
+                    for p in (getattr(settings, "no_match_replies", []) or [])
+                    if isinstance(p, str) and p.strip()
+                ]
+                if replies:
+                    pick = getattr(settings, "no_match_pick", "first")
+                    text = random.choice(replies) if pick == "random" else replies[0]
+                else:
+                    text = (
+                        "No pude comprender tu consulta. Intentá reformularla en pocas palabras o escribí 'ayuda' para ver opciones."
+                    )
+                return self._build_response(request, text, "fallback")
             return None
         reply, source = match
         return self._build_response(request, reply, source)
 
     async def _try_rag(
-        self, request: schema.ChatRequest, prediction: IntentPrediction
+        self, request: schema.ChatRequest, prediction: IntentPrediction, settings=None
     ) -> schema.ChatResponse | None:
         if prediction.intent != "rag" or self._rag is None:
             return None
-        reply = await self._rag.search(request.message)
+        # Seleccionar RAG según threshold configurado
+        responder = self._rag
+        try:
+            thr = float(getattr(settings, "rag_threshold", 0.28)) if settings is not None else 0.28
+        except Exception:
+            thr = 0.28
+        if self._rag_entries and isinstance(thr, float):
+            # Cache por threshold para evitar recomputar embeddings por request
+            cached = self._rag_cache.get(thr)
+            if cached is None:
+                self._rag_cache[thr] = SimpleRagResponder(self._rag_entries, threshold=thr)
+                cached = self._rag_cache[thr]
+            responder = cached
+        reply = await responder.search(request.message)
         if reply is None:
             return None
         return self._build_response(request, reply, "rag")
@@ -129,7 +205,12 @@ class ChatOrchestrator:
         except FileNotFoundError:
             return
         if entries:
-            self.attach_rag(SimpleRagResponder(entries))
+            # Guardar entradas para construir variantes por threshold
+            self._rag_entries = list(entries)
+            default_thr = 0.28
+            responder = SimpleRagResponder(self._rag_entries, threshold=default_thr)
+            self._rag_cache[default_thr] = responder
+            self.attach_rag(responder)
 
 # ================================================================
 # Guía de uso, parametrización e impacto (Orquestador)

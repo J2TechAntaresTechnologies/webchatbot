@@ -52,3 +52,15 @@ Acceso externo (sin DNS)
 4. Añadir componentes reutilizables de diseño municipal y pruebas de usabilidad.
 
 Más detalles sobre arquitectura de frontend y lineamientos de diseño en `docs/manual_aprendizaje.md`.
+
+## Parámetros de Reglas y RAG (Portal)
+- Reglas (FAQ/Fallback): respuestas fijas por keywords. En el Portal, el modal de Parámetros muestra un resumen y abre un editor dedicado (“Editar reglas…”). No existen “reglas RAG”; RAG es otra etapa distinta.
+- Orden de decisión (backend): Reglas → RAG → Genérico (si está ON) → LLM.
+- RAG
+  - Toggle: “Usar RAG” habilita la búsqueda en `knowledge/faqs/municipal_faqs.json` cuando el intent es `rag`.
+  - `RAG threshold` (0–1): umbral mínimo de similitud para aceptar la respuesta. 0.20–0.40 recomendado. Default 0.28.
+  - Sugerencias: bajar el umbral sube recall pero puede traer respuestas “parecidas”; subirlo aumenta precisión pero responde menos por RAG.
+
+## Accesibilidad y scroll en modales
+- Los modales de Configuración, Reglas y Ayuda limitan altura y permiten scroll interno para evitar desbordes en pantallas pequeñas.
+- Clases involucradas: `.modal` (max-height y overflow), `.settings-form` y `.help-body` (scroll interno), con scrollbar coherente al estilo del chat.

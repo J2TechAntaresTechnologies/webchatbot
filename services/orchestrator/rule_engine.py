@@ -11,14 +11,27 @@ from services.orchestrator.text_utils import normalize_text
 
 @dataclass(frozen=True)
 class Rule:
-    """Regla basada en coincidencia de palabras clave."""
+    """Regla basada en coincidencia de palabras clave.
+
+    - keywords: stems/raíces a buscar (match por subcadena tras normalizar).
+    - response: texto de respuesta.
+    - source: `faq` o `fallback` para trazabilidad.
+    - min_matches: cantidad mínima de keywords que deben aparecer. Si es None,
+      se exige match de todas (AND). Con min_matches < len(keywords) se logra
+      un comportamiento más "suave" (k-de-n) para consultas variadas.
+    """
 
     keywords: Sequence[str]
     response: str
     source: ResponseSource = "faq"
+    min_matches: int | None = None
 
     def matches(self, normalized_text: str) -> bool:
-        return all(keyword in normalized_text for keyword in self.keywords)
+        if not self.keywords:
+            return False
+        required = len(self.keywords) if self.min_matches is None else max(1, int(self.min_matches))
+        hits = sum(1 for kw in self.keywords if kw in normalized_text)
+        return hits >= required
 
 
 class RuleBasedResponder:
@@ -50,6 +63,15 @@ DEFAULT_RULES: Sequence[Rule] = (
             "Aceptamos tarjetas, débito automático y pagos en entidades adheridas."
         ),
     ),
+    # Consulta genérica sobre cómo pagar (conservadora): coincide con "como" y "pag".
+    # Devuelve la misma respuesta oficial de pagos.
+    Rule(
+        keywords=("como", "pag"),
+        response=(
+            "Podés pagar tus impuestos municipales desde la web oficial en Trámites > Pagos. "
+            "Aceptamos tarjetas, débito automático y pagos en entidades adheridas."
+        ),
+    ),
     Rule(
         keywords=("turno",),
         response="Ingresá en turnos.municipio.gob para solicitar o reprogramar tu turno municipal.",
@@ -67,17 +89,57 @@ DEFAULT_RULES: Sequence[Rule] = (
         response="¡Hola! ¿En qué puedo ayudarte hoy?",
         source="fallback",
     ),
+    # OR lógico entre "ayuda" y "menu" implementado duplicando la regla
     Rule(
         keywords=("ayuda",),
         response=(
             "Podés navegar con estas opciones:\n"
-            "1. Conocer quiénes somos y cómo trabajamos (respondé 'opcion 1').\n"
-            "2. Saber qué hace este chatbot y qué cubre (respondé 'opcion 2').\n"
-            "3. Ver canales de contacto con el municipio (respondé 'opcion 3').\n"
-            "4. Revisar trámites y servicios digitales disponibles (respondé 'opcion 4').\n"
+            "1. Conocer quiénes somos y cómo trabajamos (respondé opcion 1).\n"
+            "2. Saber qué hace este chatbot y qué cubre (respondé opcion 2).\n"
+            "3. Ver canales de contacto con el municipio respondé opcion 3).\n"
+            "4. Realizar tramites y servicios digitales disponibles (respondé opcion 4).\n"
             "Escribí el número u opción que prefieras."
         ),
         source="fallback",
+    ),
+    Rule(
+        keywords=("menu",),
+        response=(
+            "Podés navegar con estas opciones:\n"
+            "1. Conocer quiénes somos y cómo trabajamos (respondé opcion 1).\n"
+            "2. Saber qué hace este chatbot y qué cubre (respondé opcion 2).\n"
+            "3. Ver canales de contacto con el municipio respondé opcion 3).\n"
+            "4. Realizar tramites y servicios digitales disponibles (respondé opcion 4).\n"
+            "Escribí el número u opción que prefieras."
+        ),
+        source="fallback",
+    ),
+    # Regla "suave" para consultas sobre trámites y servicios digitales:
+    # Usa stems y requiere al menos 2 coincidencias para reducir falsos positivos.
+    Rule(
+        keywords=("tramit", "servici", "digital"),
+        response=(
+            "Disponés de turnos online, pagos de tasas, reclamos, consulta de ordenanzas y seguimiento de expedientes "
+            "desde tramites.municipio.gob. También podés descargar comprobantes y pedir certificados digitales."
+        ),
+        min_matches=2,
+    ),
+    # Quiénes somos (conservadora): cubre "quiénes somos" y "quiénes son".
+    Rule(
+        keywords=("quien", "somos"),
+        response=(
+            "Somos el equipo de Atención Digital del municipio, con especialistas en gestión de trámites, "
+            "participación ciudadana y tecnología cívica. Trabajamos junto a las áreas de Atención Vecinal "
+            "para darte respuestas claras y actualizadas."
+        ),
+    ),
+    Rule(
+        keywords=("quien", "son"),
+        response=(
+            "Somos el equipo de Atención Digital del municipio, con especialistas en gestión de trámites, "
+            "participación ciudadana y tecnología cívica. Trabajamos junto a las áreas de Atención Vecinal "
+            "para darte respuestas claras y actualizadas."
+        ),
     ),
     Rule(
         keywords=("opcion", "1"),

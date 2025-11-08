@@ -1,0 +1,147 @@
+Comparativa de plataformas y enfoques para webchatbot
+=====================================================
+
+Contexto del proyecto actual
+- Repositorio: webchatbot (arquitectura propia en Python + FastAPI + frontend estático).
+- Componentes clave (ver README.md, docs/architecture.md):
+  - API FastAPI (`services/api/main.py`) con CORS configurable.
+  - Orquestador (`services/orchestrator/service.py`): IntentClassifier heurístico → Reglas (FAQ) → RAG léxico → LLM (fallback) + handoff.
+  - Motor de reglas (`services/orchestrator/rule_engine.py`) y RAG ligero (`services/orchestrator/rag.py`).
+  - Adaptador LLM (`services/llm_adapter/client.py`) con llama.cpp opcional; placeholder seguro si no hay modelo.
+  - Configuración por bot persistente (`/chatbots/{id}/settings`), visible y editable desde el Portal (frontend).
+  - Frontend estático (Portal + clientes municipal y MAR2) con autodetección de API y temas persistidos en localStorage.
+  - Pruebas unitarias del orquestador (ruta reglas, RAG, fallback, handoff).
+
+Resumen ejecutivo
+- Este proyecto prioriza control, portabilidad on‑prem y latencia predecible con LLM local (cuando se habilita).
+- Rasa Open Source prioriza NLU/diálogo tradicional (intents, slots, reglas, políticas) con fuerte tooling de entrenamiento y conectores.
+- Botpress prioriza time‑to‑value con un estudio visual, QnA/Knowledge integrados y flujos; la versión Cloud añade hosting y límites/planes.
+
+Tabla A — Enfoque y arquitectura
+| Criterio | Este proyecto (FastAPI + orquestador) | Rasa Open Source | Botpress (Studio/Cloud) |
+| --- | --- | --- | --- |
+| Paradigma | Orquestación ligera (reglas → RAG → LLM) | NLU + Policies (stories, rules, forms/slots) | Flow‑builder visual + QnA/KB + acciones |
+| Lenguaje base | Python (async) | Python | TypeScript/Node (Cloud gestionado) |
+| Despliegue | On‑prem/VM simple (uvicorn + http server) | On‑prem/containers; servidor Rasa + actions | SaaS (Cloud) u OSS v12 heredado (EOL) |
+| Estado de conversación | Stateless (por diseño, extensible) | Tracker con eventos (memoria, slots) | Estado de conversación en plataforma |
+| Extensibilidad | Alta: sustituir componentes por protocolos simples | Alta: pipelines, policies, custom actions | Alta: SDK/acciones; baja en OSS actual |
+
+Tabla B — NLU/diálogo y orquestación
+| Criterio | Este proyecto | Rasa OSS | Botpress |
+| --- | --- | --- | --- |
+| NLU | Heurístico por keywords (stems) | Pipelines (DIET, Regex, spaCy, HF) | Intents/flows, NLU gestionado por plataforma |
+| Diálogo | Reglas mínimas + fallback | Stories, Rules, Forms/Slots, Policies | Flujos visuales, nodos condicionales |
+| Handoff | Regla de intent “handoff” | Via custom actions/rules | Nativo (Human handoff/Inbox) |
+| Testing NLU/diálogo | Pytest custom | `rasa test` (NLU/stories) | Flows e inspección interactiva |
+
+Tabla C — LLM y RAG
+| Criterio | Este proyecto | Rasa OSS | Botpress |
+| --- | --- | --- | --- |
+| LLM | llama.cpp local (opcional) + parámetros (T, top‑p, max_tokens) | Integrable vía custom actions o wrappers; no nativo en OSS | Cloud gestiona modelos (OpenAI/otros según plan) |
+| RAG | Léxico en memoria (coseno TF, JSON) | Vía actions a vector store/KB | KB/QnA integrado (subida de docs, web crawling) |
+| Guardrails | Reglas previas + posibilidad de moderación | Policies + validadores + actions | Controles de contenido + settings en plataforma |
+
+Tabla D — Rendimiento/latencia (orientativo)
+| Carga típica | Este proyecto | Rasa OSS | Botpress |
+| --- | --- | --- | --- |
+| Reglas/FAQ | ~1–5 ms (in‑proc) | ~5–20 ms (server Python) | ~10–50 ms (red + plataforma) |
+| RAG léxico local | ~2–10 ms (dataset pequeño) | Según implementación (comparable) | KB Cloud (red; depende del plan) |
+| LLM | llama.cpp local: latencia estable, sin red (tokens/s depende HW) | Externo/local vía actions (depende proveedor) | Cloud (depende proveedor y región) |
+Notas: números cualitativos; latencia real varía por hardware, tamaño de dataset, red y proveedor de LLM.
+
+Tabla E — Límites de uso y costos
+| Aspecto | Este proyecto | Rasa OSS | Botpress |
+| --- | --- | --- | --- |
+| Límites de uso | Sin límites inherentes | Sin límites (depende de tu infra) | Según plan Cloud (mensajes/usuarios/rate‑limit) |
+| Costos variables | 0 si LLM local; energía/hardware | Entrenamiento/infra propia | Suscripción + tokens/LLM (según plan) |
+| Licencia | MIT (deps: MIT/BSD/Apache) | Apache‑2.0 (Rasa OSS) | Cloud propietario; OSS v12 histórico en desuso |
+
+Tabla F — DevOps y despliegue
+| Criterio | Este proyecto | Rasa OSS | Botpress |
+| --- | --- | --- | --- |
+| Contenerización | Pendiente (roadmap) | Oficial (Docker) | Cloud gestionado (sin Docker propio) |
+| CI/CD | Pendiente | Integrable; tooling maduro | En Cloud, pipelines propios |
+| Observabilidad | Scripts + plan OTel | Integrable (OpenTelemetry) | Métricas/analytics en plataforma |
+
+Tabla G — Seguridad y privacidad
+| Criterio | Este proyecto | Rasa OSS | Botpress |
+| --- | --- | --- | --- |
+| Datos sensibles | On‑prem, control total | On‑prem posible | Cloud (revisar DPA/ubicación) |
+| Moderación | A implementar (roadmap) | Rules/actions | Controles integrados |
+| Cumplimiento | Autogestionado | Autogestionado | Según políticas del proveedor |
+
+Tabla H — Experiencia de desarrollo y pruebas
+| Criterio | Este proyecto | Rasa OSS | Botpress |
+| --- | --- | --- | --- |
+| Curva de aprendizaje | Baja‑media (Python web) | Media‑alta (NLU/diálogo) | Baja (visual), media si se programan actions |
+| Pruebas | pytest (unitarias) | `rasa test` + pytest actions | Testing en flujos; unit tests con SDK |
+| Customización | Total (código abierto) | Total con acciones | Alta pero mediada por plataforma |
+
+Tabla I — Canales y frontend
+| Criterio | Este proyecto | Rasa OSS | Botpress |
+| --- | --- | --- | --- |
+| Webchat | Propio (frontend estático) | Conector webchat/Socket | Widget/Canal web nativo |
+| WhatsApp/Telegram/Slack | Vía integraciones a construir | Conectores oficiales y comunidad | Conectores listos (Cloud) |
+| Panel/Studio | Portal simple | Rasa X/Pro (separado) | Studio visual completo |
+
+Tabla J — Casos recomendados
+| Necesidad | Este proyecto | Rasa OSS | Botpress |
+| --- | --- | --- | --- |
+| On‑prem, bajo costo variable | Excelente | Bueno | Limitado (Cloud) |
+| NLU avanzado y diálogo complejo | Básico (extensible) | Excelente | Bueno (flujos) |
+| Go‑to‑market veloz sin DevOps | Medio | Medio | Excelente |
+| Control/privacidad de datos | Excelente | Excelente | Variable (Cloud) |
+
+Cómo replicar este proyecto en Rasa Open Source (guía de alto nivel)
+1) Estructura de proyecto Rasa: crear `domain.yml`, `data/nlu.yml`, `data/stories.yml`, `data/rules.yml`, `actions/actions.py`.
+2) Intents y NLU: migrar patrones de `IntentClassifier` a ejemplos NLU (sinónimos, regex) y entrenar DIET/spaCy/HF.
+3) Respuestas fijas (reglas/FAQ): mover `DEFAULT_RULES` a `responses:` del `domain.yml` y `rules.yml` para smalltalk/FAQ; usar utter_.*.
+4) RAG: implementar en `actions.py` una custom action que consulte tu vector store o, para PoC, el RAG léxico (port de `SimpleRagResponder`).
+5) Fallback/handoff: policies de fallback + custom actions para derivación humana.
+6) Parámetros por bot/canal: usar slots/config de canal y condiciones en rules/stories; o múltiples dominios.
+7) Frontend: usar canal web de Rasa o mantener tu frontend y consumir `POST /webhooks/rest/webhook`.
+8) Testing: `rasa test nlu` y `rasa test core`; añadir tests de actions con pytest.
+
+Cómo replicar este proyecto en Botpress
+1) Crear un bot en Botpress Studio (Cloud) y activar el canal web.
+2) Cargar Knowledge Base con el contenido de `knowledge/faqs/*.json` (convertido a Q&A o documentos).
+3) Modelar flujos para smalltalk/ayuda/menú (equivalentes a `DEFAULT_RULES`).
+4) Acciones personalizadas: implementar llamadas a APIs o a un RAG propio si se requiere precisión mayor.
+5) Parametrización: exponer variables (temperature/top‑p/max_tokens) donde aplique; parte depende del proveedor de LLM.
+6) Handoff humano: usar la funcionalidad nativa de Inbox/Live‑chat.
+7) Frontend: incrustar el widget web de Botpress en tu `frontend/*.html` o usar el suyo por defecto.
+8) Consideraciones de límites/costos: elegir plan según el volumen (mensajes, usuarios, rate limits) y revisar políticas de datos.
+
+Rendimiento y escalabilidad — observaciones
+- Reglas y RAG local en este proyecto son O(n) con n pequeño (FAqs), muy rápidos en una sola instancia.
+- LLM local elimina latencia de red y costos variables, a cambio de throughput ligado a CPU/GPU.
+- Rasa añade robustez NLU en clasificación y diálogo con coste de entrenamiento y mantenimiento de datos.
+- Botpress acelera la entrega y ofrece escalado gestionado, pero añade latencia de red y dependencia del proveedor.
+
+Seguridad y cumplimiento
+- Este proyecto permite aislar datos en on‑prem e integrar moderación antes de LLM; falta implementar la capa de moderación (en roadmap).
+- Rasa OSS requiere diseño de privacy por tu cuenta (anónimos, retención, auditoría de eventos).
+- Botpress Cloud implica revisar contratos (DPA), almacenamiento, retención y ubicación de datos.
+
+Auditoría rápida del repositorio y documentación
+- Cobertura documental: README, arquitectura, operación, manual de aprendizaje, guía avanzada, índice y guías de knowledge/frontend están actualizadas y coherentes.
+- API/contrato: claramente documentado (`POST /chat/message`) y respaldado por tests unitarios.
+- Frontend: Portal funcional con configuración por bot; documentación clara de `WEBCHATBOT_API_BASE_URL` y CORS.
+- Scripts: comprobación de host (`check_host_readiness.py`) y tuning de latencia; útiles y bien descritos.
+- Observaciones menores (sugerencias):
+  - `rule_engine.py`: corregir typo en texto de ayuda ("opciosnes" → "opciones").
+  - `docs/guia_tecnologias_avanzada.md`: se menciona logging con structlog; aún no hay config central de logging estructurado (ver roadmap hito #1).
+  - Añadir un `THIRD_PARTY_NOTICES.md` opcional (licencias) si se prepara un release público.
+  - Considerar `docker-compose` básico (API + servidor estático + vector store futuro) para facilitar pruebas.
+
+Recomendaciones de elección rápida
+- Elegí este proyecto cuando: necesitas on‑prem, bajo costo variable, control total y latencia consistente; alcance municipal acotado con reglas/FAQ y RAG.
+- Elegí Rasa OSS cuando: tenés requerimientos de NLU/diálogo complejos (slots, formularios, historias), múltiples canales y equipo de datos/NLP.
+- Elegí Botpress cuando: la prioridad es velocidad de entrega con KB/flows y no es requisito on‑prem estricto; asumís límites y costos del servicio Cloud.
+
+Próximos pasos propuestos (para este repo)
+1) Implementar moderación previa al LLM y logging estructurado (OpenTelemetry/structlog) como en `docs/roadmap.md`.
+2) Añadir `docker-compose` y pipeline mínimo de CI (test + build) para preparar el public repo.
+3) Corregir typos menores y añadir una prueba de contrato a `/chat/message` con `httpx.AsyncClient`.
+4) Planificar migración de RAG a embeddings + vector store (Chroma/Qdrant) manteniendo `RagResponderProtocol`.
+

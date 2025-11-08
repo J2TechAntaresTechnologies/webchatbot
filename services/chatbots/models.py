@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, PositiveInt, field_validator
 
@@ -24,6 +24,31 @@ class GenerationSettings(BaseModel):
 class FeatureToggles(BaseModel):
     use_rules: bool = Field(True, description="Usar motor de reglas/FAQ")
     use_rag: bool = Field(True, description="Usar RAG si disponible")
+    use_generic_no_match: bool = Field(
+        False,
+        description=(
+            "Responder con un mensaje genérico predefinido cuando no haya coincidencias en reglas/RAG y el intent no derive a handoff."
+        ),
+    )
+    enable_default_rules: bool = Field(
+        True,
+        description="Incluir el set de reglas por defecto del motor (DEFAULT_RULES) además de las reglas personalizadas.",
+    )
+
+
+class RuleConfig(BaseModel):
+    """Regla configurable desde settings.
+
+    - enabled: si la regla está activa.
+    - keywords: lista de palabras clave/stems (match AND).
+    - response: texto a devolver si coincide.
+    - source: etiqueta de origen (faq|fallback). Se usa para trazabilidad.
+    """
+
+    enabled: bool = Field(True)
+    keywords: list[str] = Field(default_factory=list)
+    response: str = Field("")
+    source: Literal["faq", "fallback"] = Field("faq")
 
 
 class MenuItem(BaseModel):
@@ -34,15 +59,38 @@ class MenuItem(BaseModel):
 class BotSettings(BaseModel):
     generation: GenerationSettings = Field(default_factory=GenerationSettings)
     features: FeatureToggles = Field(default_factory=FeatureToggles)
+    rag_threshold: float = Field(0.28, ge=0.0, le=1.0, description="Umbral de similitud para RAG [0,1]")
     menu_suggestions: list[MenuItem] = Field(default_factory=list)
     pre_prompts: list[str] = Field(default_factory=list, description="Instrucciones iniciales a inyectar antes del mensaje del usuario")
+    no_match_replies: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Respuestas genéricas a usar cuando no hay match y use_generic_no_match=True. Se usa la primera disponible."
+        ),
+    )
+    no_match_pick: Literal["first", "random"] = Field(
+        "first",
+        description="Estrategia para elegir la respuesta genérica: 'first' o 'random'",
+    )
+    rules: list[RuleConfig] = Field(
+        default_factory=list,
+        description="Lista de reglas personalizadas a sumar (o reemplazar) al motor de reglas.",
+    )
 
     def clamped(self) -> "BotSettings":
         return BotSettings(
             generation=self.generation.clamped(),
             features=self.features,
+            rag_threshold=min(max(float(getattr(self, "rag_threshold", 0.28)), 0.0), 1.0),
             menu_suggestions=self.menu_suggestions,
             pre_prompts=[p for p in self.pre_prompts if isinstance(p, str) and p.strip() != ""],
+            no_match_replies=[p.strip() for p in (self.no_match_replies or []) if isinstance(p, str) and p.strip() != ""],
+            no_match_pick=(self.no_match_pick if getattr(self, "no_match_pick", "first") in {"first", "random"} else "first"),
+            rules=[
+                RuleConfig.model_validate(r)
+                for r in (getattr(self, "rules", []) or [])
+                if isinstance(r, (dict, RuleConfig))
+            ],
         )
 
 
@@ -67,14 +115,21 @@ def defaults_for(bot_id: str, channel: str | None = None) -> BotSettings:
     if bot_id == "mar2" or (channel or "").lower() in {"mar2", "free"}:
         return BotSettings(
             generation=GenerationSettings(temperature=0.7, top_p=0.9, max_tokens=256),
-            features=FeatureToggles(use_rules=False, use_rag=False),
+            features=FeatureToggles(use_rules=False, use_rag=False, use_generic_no_match=False, enable_default_rules=False),
+            rag_threshold=0.28,
             menu_suggestions=[],
             pre_prompts=[],
+            no_match_replies=[
+                "No pude comprender tu consulta. Escribí 'ayuda' para ver opciones o contame en pocas palabras qué necesitás.",
+            ],
+            no_match_pick="first",
+            rules=[],
         )
     # Por defecto (municipal web guiado)
     return BotSettings(
         generation=GenerationSettings(temperature=0.7, top_p=0.9, max_tokens=256),
-        features=FeatureToggles(use_rules=True, use_rag=True),
+        features=FeatureToggles(use_rules=True, use_rag=True, use_generic_no_match=False, enable_default_rules=True),
+        rag_threshold=0.28,
         menu_suggestions=[
             MenuItem(label="Pagar impuestos", message="¿Cómo pago mis impuestos?"),
             MenuItem(label="Sacar turno", message="Quiero sacar un turno"),
@@ -82,6 +137,11 @@ def defaults_for(bot_id: str, channel: str | None = None) -> BotSettings:
             MenuItem(label="Ayuda", message="ayuda"),
         ],
         pre_prompts=[],
+        no_match_replies=[
+            "No tengo una respuesta exacta para eso. Podés escribir 'ayuda' para ver el menú o reformular en pocas palabras.",
+        ],
+        no_match_pick="first",
+        rules=[],
     )
 
 

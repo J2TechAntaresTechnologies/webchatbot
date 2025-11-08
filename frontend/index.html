@@ -7,9 +7,11 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- Contenedor principal del Portal de Chatbots -->
     <main class="chat-container" aria-label="Portal de Chatbots">
       <div class="topbar">
         <h1>Portal de Chatbots</h1>
+        <!-- Controles del tema (selector rápido y botón de configuración) -->
         <div class="top-controls">
           <label for="theme-select-quick" class="theme-label">Tema:</label>
           <select id="theme-select-quick" class="theme-select" aria-label="Seleccionar tema"></select>
@@ -20,6 +22,7 @@
       <section id="bot-list" class="chat-log" aria-live="polite"></section>
     </main>
     <!-- Modal de configuración -->
+    <!-- Backdrop + modal de parámetros por bot -->
     <div id="settings-backdrop" class="modal-backdrop" hidden>
       <div class="modal" role="dialog" aria-labelledby="settings-title" aria-modal="true">
         <div class="modal-header">
@@ -38,6 +41,25 @@
             <legend>Comportamiento</legend>
             <label><input id="stg-userules" type="checkbox" /> Usar reglas/FAQ</label>
             <label><input id="stg-userag" type="checkbox" /> Usar RAG</label>
+            <label><input id="stg-enable-default-rules" type="checkbox" /> Incluir reglas predefinidas del sistema</label>
+            <label>
+              RAG threshold
+              <input id="stg-rag-threshold" name="rag_threshold" type="number" step="0.01" min="0" max="1" />
+            </label>
+          </fieldset>
+          <fieldset id="stg-generic-fieldset" hidden>
+            <legend>Respuesta genérica (no-match)</legend>
+            <label><input id="stg-use-generic" type="checkbox" /> Responder genérico si no hay coincidencia</label>
+            <div id="stg-no-match-list" class="suggestions-editor" aria-label="Respuestas genéricas"></div>
+            <button id="stg-add-no-match" type="button" class="btn-link">Agregar respuesta genérica</button>
+            <label>
+              Estrategia
+              <select id="stg-no-match-pick">
+                <option value="first">Siempre usar la primera respuesta</option>
+                <option value="random">Elegir una respuesta al azar</option>
+              </select>
+            </label>
+            <p class="hint">Se usa si el intent es FAQ/Smalltalk sin match de reglas o si el intent es desconocido (unknown), y esta opción está activada.</p>
           </fieldset>
           <fieldset>
             <legend>Instrucciones iniciales (pre-prompts)</legend>
@@ -49,6 +71,13 @@
             <div id="stg-suggestions" class="suggestions-editor"></div>
             <button id="stg-add-suggestion" type="button" class="btn-link">Agregar sugerencia</button>
           </fieldset>
+          <fieldset>
+            <legend>Reglas personalizadas</legend>
+            <p id="stg-rules-summary" class="hint">Cargando reglas…</p>
+            <button id="stg-rules-edit" type="button" class="btn-link">Editar reglas…</button>
+            <p class="hint">La edición se realiza en una ventana dedicada. Al guardar o cancelar volverás aquí.</p>
+          </fieldset>
+          
         </form>
         <div class="modal-actions">
           <button id="settings-save" type="button">Guardar</button>
@@ -57,32 +86,63 @@
         </div>
       </div>
     </div>
+    <!-- Editor dedicado de Reglas -->
+    <!-- Backdrop + modal exclusivo para reglas personalizadas -->
+    <div id="rules-backdrop" class="modal-backdrop" hidden>
+      <div class="modal" role="dialog" aria-labelledby="rules-title" aria-modal="true">
+        <div class="modal-header">
+          <h2 id="rules-title">Editar reglas personalizadas</h2>
+        </div>
+        <div id="rules-editor-list" class="rules-editor" aria-label="Listado de reglas"></div>
+        <div class="modal-actions" style="justify-content: space-between;">
+          <button id="rules-add-rule" type="button" class="btn-link">Agregar regla</button>
+          <div>
+            <button id="rules-save" type="button">Guardar</button>
+            <button id="rules-cancel" type="button" class="btn-secondary">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Ayuda de parámetros -->
+    <!-- Backdrop + modal de ayuda de parámetros -->
     <div id="help-backdrop" class="modal-backdrop" hidden>
       <div class="modal" role="dialog" aria-labelledby="help-title" aria-modal="true">
-        <h2 id="help-title">Ayuda — Parámetros (MAR2 modo libre)</h2>
+        <h2 id="help-title">Ayuda — Parámetros del Chatbot</h2>
         <div class="help-body">
           <p><strong>Generación</strong></p>
           <ul>
-            <li><strong>Temperature</strong>: aleatoriedad/creatividad del modelo. Más alto = respuestas más creativas y variadas; más bajo = más precisas y repetibles. Recomendado en MAR2: 0.8–1.1. Default: 0.7.</li>
-            <li><strong>Top‑p</strong>: “nucleus sampling”, limita el muestreo al núcleo de probabilidad acumulada. 0.9–1.0 da más variedad; 0.6–0.8 lo hace más conservador. Default: 0.9.</li>
-            <li><strong>Max tokens</strong>: longitud máxima de la respuesta. Más alto = respuestas más largas pero más lentas; muy bajo puede truncar. Default: 256.</li>
-          </ul>
-          <p><strong>Instrucciones iniciales (pre‑prompts)</strong></p>
-          <ul>
-            <li>Lista de indicaciones previas que el bot tendrá en cuenta antes de responder (p. ej.: “comportate como especialista en mecánica”, “respuestas breves”). Se inyectan automáticamente en el prompt del modelo.</li>
+            <li><strong>Temperature</strong>: aleatoriedad/creatividad del modelo. 0.6–0.8 (Municipal), 0.8–1.1 (MAR2). Default: 0.7.</li>
+            <li><strong>Top‑p</strong>: núcleo de probabilidad. 0.8–0.95 (Municipal), 0.9–1.0 (MAR2). Default: 0.9.</li>
+            <li><strong>Max tokens</strong>: longitud máxima de la respuesta. Default: 256.</li>
           </ul>
           <p><strong>Comportamiento</strong></p>
           <ul>
-            <li><strong>Usar reglas/FAQ</strong> y <strong>Usar RAG</strong>: en MAR2 no aplican (va directo al LLM). En el bot Municipal sí tienen efecto.</li>
+            <li><strong>Usar reglas/FAQ</strong>: activa respuestas fijas (saludos, ayuda, pagos, etc.).</li>
+            <li><strong>Usar RAG</strong>: permite buscar en la base `knowledge/faqs/municipal_faqs.json` cuando el intent es RAG.</li>
+            <li><strong>RAG threshold</strong>: umbral de similitud (0–1). Recomendado 0.20–0.40. Más bajo = más recall (y posibles falsos positivos); más alto = más precisión (pero puede no devolver resultados).</li>
+            <li><strong>Incluir reglas predefinidas</strong>: evalúa tus reglas primero y luego las default del sistema.</li>
+          </ul>
+          <p><strong>Orden de decisión</strong></p>
+          <ul>
+            <li>Reglas (si intent es FAQ/Smalltalk y “Usar reglas” está ON) → RAG (si intent es RAG y “Usar RAG” está ON) → Genérico (si está ON y no hubo match) → LLM.</li>
+          </ul>
+          <p><strong>Respuesta genérica (no‑match)</strong></p>
+          <ul>
+            <li>Activá “Responder genérico si no hay coincidencia”. Cargá múltiples frases y elegí estrategia: primera o al azar.</li>
+          </ul>
+          <p><strong>Reglas personalizadas</strong></p>
+          <ul>
+            <li>Definí <em>Keywords</em> (separadas por coma), <em>Respuesta</em> y <em>Origen</em> (faq/fallback). No existen “reglas RAG”; RAG es otra etapa.</li>
+            <li>Prioridad: tus reglas se evalúan antes que las default si están incluidas.</li>
+            <li>La edición de reglas se realiza en una ventana dedicada (“Editar reglas…”).</li>
           </ul>
           <p><strong>Menú (sugerencias)</strong></p>
           <ul>
-            <li>Guarda pares Etiqueta/Mensaje. En Municipal se muestran como chips. En MAR2 no se muestran por diseño (se puede habilitar si lo necesitás).</li>
+            <li>Pares etiqueta/mensaje para chips en el cliente Municipal.</li>
           </ul>
           <p><strong>Persistencia</strong></p>
           <ul>
-            <li>Los cambios se guardan para todos en el servidor (chatbots/&lt;id&gt;/settings.json) y sobreviven reinicios. “Restablecer” vuelve a los valores estándar.</li>
+            <li>Se guarda en `chatbots/&lt;id&gt;/settings.json`. “Restablecer” vuelve a los valores estándar.</li>
           </ul>
         </div>
         <div class="modal-actions">
@@ -91,6 +151,7 @@
       </div>
     </div>
     <!-- Configuración de tema -->
+    <!-- Backdrop + modal de configuración de tema -->
     <div id="theme-backdrop" class="modal-backdrop" hidden>
       <div class="modal" role="dialog" aria-labelledby="theme-title" aria-modal="true">
         <div class="modal-header">
@@ -137,6 +198,6 @@
         </div>
       </div>
     </div>
-    <script defer src="portal.js"></script>
+    <script defer src="portal.js?v=20251107"></script>
   </body>
 </html>

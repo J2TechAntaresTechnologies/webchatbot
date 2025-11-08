@@ -6,8 +6,11 @@
   },
   "features": {
     "use_rules": true,
-    "use_rag": true
+    "use_rag": true,
+    "use_generic_no_match": true,
+    "enable_default_rules": true
   },
+  "rag_threshold": 0.28,
   "menu_suggestions": [
     {
       "label": "Pagar impuestos",
@@ -27,6 +30,29 @@
     }
   ],
   "pre_prompts": [
-    "eres un agente de atencion al publico de una entidad publica dedicada a la recaudacion y cobro de: servicios, impuestos , y tramites civiles. siempre intenta llevar la conversacion hacia alguna de las operaciones posibles para el susuario: Pagar servicios, Pagar impuestos, Sacar turno, Hacer reclamo, Ayuda."
+    "responde con frases cortas , no mas de dos renglones"
+  ],
+  "no_match_replies": [
+    "No tengo una respuesta exacta para eso. Podés escribir 'ayuda' para ver el menú o reformular en pocas palabras.",
+    "no estoy entendiendo que es lo que queres decirme , si escribis \"ayuda\", puedo decirte el menu de opciones"
+  ],
+  "no_match_pick": "random",
+  "rules": [
+    {
+      "enabled": true,
+      "keywords": [
+        "impuestos"
+      ],
+      "response": "Podes pagar impuestos en www.impuestosvilla.com",
+      "source": "faq"
+    },
+    {
+      "enabled": true,
+      "keywords": [
+        "perro"
+      ],
+      "response": "toda la informacion sobre mascotas en:\n\nwww.mascotas.pop",
+      "source": "faq"
+    }
   ]
 }
