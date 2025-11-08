@@ -28,7 +28,7 @@ docs/
 - `services/api`: aplicación FastAPI y punto de entrada (`main.py`).
 - `services/orchestrator`: motor de decisiones, clasificación de intents y conectores RAG/LLM.
 - `services/llm_adapter`: stub del cliente LLM.
-- `knowledge/faqs`: dataset JSON para el RAG léxico de ejemplo.
+- `knowledge/faqs`: dataset JSON/JSONC para el RAG léxico de ejemplo (admite comentarios; el loader los elimina en runtime).
 - `frontend`: portal estático y clientes que consumen `/chat/message` vía `fetch`.
 - `chatbots/`: variantes de chatbots con metadatos y configuración (p. ej. `chatbots/municipal/config.json`).
 - `modelos/`: carpeta compartida opcional para archivos `.gguf` accesibles por la aplicación.
@@ -36,10 +36,22 @@ docs/
 
 ## Estado actual
 - Endpoint `/chat/message` expuesto a través de FastAPI y orquestador modular.
-- Clasificador de intents heurístico con rutas a reglas FAQ, RAG léxico y fallback LLM.
-- Base de conocimiento de ejemplo (`knowledge/faqs/municipal_faqs.json`) usada por el RAG.
+- Clasificador de intents heurístico con rutas a reglas FAQ (custom + default configurables), RAG léxico y fallback (genérico opcional) o LLM.
+- Base de conocimiento de ejemplo (`knowledge/faqs/municipal_faqs.json`) usada por el RAG (con soporte de comentarios JSONC).
 - Tests unitarios cubren reglas, RAG, fallback y handoff; `./bin/python -m pytest` ejecuta 7 casos en verde.
 - Frontend con portal y variantes: `frontend/index.html` (Portal de Chatbots), `frontend/municipal.html` (Chatbot Municipal) y `frontend/mar2.html` (MAR2, conversación libre) con integración vía `fetch`.
+
+## Parámetros: Reglas y RAG (cómo funciona)
+- Orden de decisión del orquestador: Reglas (FAQ/Fallback) → RAG → Genérico (si está habilitado y no hubo match) → LLM.
+- Reglas
+  - Dos orígenes posibles para trazabilidad: `faq` (respuestas oficiales) y `fallback` (saludos/ayuda/menú, smalltalks). Ambas cortan el flujo si matchean.
+  - No existen “reglas RAG”. RAG es una etapa separada de recuperación en base de conocimiento.
+- RAG
+  - Toggle `features.use_rag`: activa/desactiva la búsqueda en `knowledge/faqs/municipal_faqs.json` cuando el intent del clasificador es `rag`.
+  - `rag_threshold` [0–1]: umbral mínimo de similitud de coseno para aceptar la respuesta. Default 0.28; recomendado 0.20–0.40 según calidad de datos.
+  - Si no supera el umbral, continúa el flujo (genérico/LLM).
+  - Afinado: mejorar `tags` en el dataset y ajustar el umbral según recall/precisión deseados.
+
 
 ## Instalación
 1. Crear/activar entorno virtual (recomendado Python 3.10+). En este repositorio se incluye uno (`bin/python`).
@@ -171,10 +183,10 @@ Revisá `docs/roadmap.md` para un plan con los próximos 10 hitos técnicos.
 
 ## Guías in‑code (referencia rápida)
 - `services/orchestrator/intent_classifier.py`: uso, parametrización, impacto y presets de intents.
-- `services/orchestrator/service.py`: flujo Reglas → RAG → LLM, pre_prompts, toggles y puntos de extensión.
+- `services/orchestrator/service.py`: flujo Reglas → RAG → Genérico (si habilitado) → LLM, pre_prompts, toggles y puntos de extensión.
 - `services/orchestrator/rule_engine.py`: definición de reglas, matching y orden.
-- `services/orchestrator/rag.py`: RAG ligero, threshold y dataset JSON.
-- `services/chatbots/models.py`: esquema de settings por bot e IO `chatbots/<id>/settings.json`.
+- `services/orchestrator/rag.py`: RAG ligero, threshold y dataset JSON/JSONC.
+- `services/chatbots/models.py`: esquema de settings por bot e IO `chatbots/<id>/settings.json` (incluye reglas custom, toggles y respuestas genéricas).
 - `services/chatbots/router.py`: API de settings (GET/PUT/POST reset) con ejemplos `curl`.
 - `services/orchestrator/router.py`: contrato `POST /chat/message` y ejemplo.
 - `services/llm_adapter/client.py`: cliente LLM, variables de entorno y logging.
