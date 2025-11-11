@@ -1,0 +1,175 @@
+Resumen De Datos Encontrados
+
+En 00relevamientos_j2/munivilladata hay dos guías con contenido curado para Villa Constitución:
+Bienestar/Salud: CIC, AMSA, Consumos problemáticos, Dirección de Género e Igualdad, Punto Violeta, Certificado de Discapacidad, campañas “Chau! Dengue”.
+Educación/Juventud: Deporte y Juventud, Educación (Congreso CER), Fondo de Asistencia Educativa, Economía Social.
+Trámites: Trámites online, Turnos online (licencia de conducir), Inscripción de proveedores.
+Ciudad y comunidad: Cultura (agenda), Turismo (atractivos), Ambiente (Villa Más Limpia), Obras Privadas, Planificación, Comercio.
+Información y contacto: Noticias/redes, números de emergencia (911, 107, 100) y teléfono municipal (435500).
+Referencias útiles del repo
+
+Intentos y reglas: services/orchestrator/intent_classifier.py:1, services/orchestrator/rule_engine.py:1
+RAG (FAQs): knowledge/faqs/municipal_faqs.json:1
+Settings por bot: chatbots/municipal/settings.json:1, chatbots/mar2/settings.json:1
+El portal muestra chips desde settings: frontend/app.js:134
+Menú de Navegación/Conversación (Municipal)
+
+Bienestar y Salud
+Centros: CIC, AMSA, Consumos problemáticos, Género e Igualdad, Punto Violeta, Certificado de Discapacidad
+Campañas: “Chau! Dengue”
+Educación y Juventud
+Deporte y Juventud, Educación (Congreso CER), Fondo de Asistencia Educativa, Economía Social
+Trámites y Gestiones
+Trámites Online, Turnos Online (Licencia de Conducir), Inscripción de Proveedores
+Cultura, Turismo y Ambiente
+Cultura (agenda), Turismo (atractivos), Ambiente (Villa Más Limpia)
+Desarrollo Urbano y Comercio
+Obras Privadas, Planificación, Comercio
+Información y Contacto
+Noticias y redes, Emergencias (911/107/100), Teléfono municipal (435500)
+Sugerencias de chips (menu_suggestions)
+
+“Trámites online”, “Turnos licencia de conducir”, “Inscripción de proveedores”
+“Punto Violeta”, “Consumos problemáticos”, “Certificado de discapacidad”
+“Cultura y agenda”, “Turismo”, “Ambiente (Villa Más Limpia)”
+“Economía social”, “Obras privadas”, “Contacto y emergencias”
+“Ayuda”
+Parámetros recomendados
+
+Bot municipal (guiado)
+generation: temperature 0.65–0.75, top_p 0.85–0.9, max_tokens 180–220
+features: use_rules=true, use_rag=true, use_generic_no_match=true, enable_default_rules=true
+rag_threshold: 0.28 (ajustar 0.25–0.35 según recall/precisión)
+pre_prompts (estilo/seguridad):
+“Responde con frases cortas y claras; listas con viñetas cuando enumeres.”
+“Prefiere fuentes oficiales y menciona el canal/área responsable cuando aplique.”
+“Ante emergencias: indicar 911 (Policía), 107 (Hospital), 100 (Bomberos).”
+“Si la consulta excede el alcance del municipio, indicá el organismo competente.”
+Bot MAR2 (modo libre)
+generation: temperature 0.9–1.1, top_p 0.95–1.0, max_tokens 256–300
+features: use_rules=false, use_rag=false, use_generic_no_match=false
+Integración técnica (dónde y cómo)
+
+Menú (chips) y estilo
+Editar chips en chatbots/municipal/settings.json:1 (clave menu_suggestions).
+Estilo (pre_prompts) en el mismo archivo (clave pre_prompts).
+Efecto: los chips se muestran en el cliente municipal (frontend/app.js:134); los pre_prompts se anteponen al prompt cuando el flujo cae al LLM (services/orchestrator/service.py:96).
+Reglas (FAQ/fallback) rápidas
+Añadir reglas en chatbots/municipal/settings.json:1 (clave rules), priorizadas sobre DEFAULT_RULES (services/orchestrator/service.py:132).
+Propuestas de reglas (ejemplos):
+Emergencias
+keywords: ["emergenc","policia","bombero","accident","hospital"]
+response: “Emergencias: Policía 911, Hospital 107, Bomberos 100. Teléfono municipal: 435500.”
+source: "fallback"
+Turnos licencia conducir
+keywords: ["turno","licenc","conduc"]
+response: “Solicitá o reprogramá tu turno de Licencia de Conducir en [enlace oficial].”
+Inscripción de proveedores
+keywords: ["proveedor","inscrip","compra"]
+response: “La inscripción de proveedores se realiza en [enlace oficial] con CUIT y documentación requerida.”
+Certificado de discapacidad
+keywords: ["certific","discap"]
+response: “Consultá requisitos y turnos para Certificado de Discapacidad en [enlace/área oficial].”
+Punto Violeta
+keywords: ["punto violeta","violeta","genero","violenc"]
+response: “Punto Violeta brinda escucha y contención. Acercate a [ubicación/horarios] o consultá en [enlace].”
+Efecto: respuestas instantáneas en intents faq/smalltalk (services/orchestrator/rule_engine.py:67 y 86).
+RAG (FAQs enriquecidas)
+Agregar entradas en knowledge/faqs/municipal_faqs.json:1 (se permite JSONC con comentarios).
+Ejemplos de KnowledgeEntry:
+Punto Violeta
+uid: "vc-001", question: "¿Qué es y dónde está el Punto Violeta?"
+answer: “Punto Violeta es un espacio de escucha y contención en temas de género. Consultá ubicación/horarios en [enlace oficial] o Atención Ciudadana.”
+tags: ["genero","violeta","igualdad","apoyo"]
+Consumos problemáticos
+uid: "vc-002", question: "¿Dónde puedo pedir ayuda por consumos problemáticos?"
+answer: “El municipio brinda orientación y acompañamiento. Contacto en [enlace/área], o pedí turno en [canal].”
+tags: ["consumo","adiccion","salud","apoyo"]
+Certificado de Discapacidad
+uid: "vc-003", question: "¿Cómo tramito el Certificado de Discapacidad?"
+answer: “Requisitos, turnos y evaluación en [enlace]. Presentar documentación médica actualizada.”
+tags: ["certificado","discapacidad","tramite"]
+AMSA / CIC
+uid: "vc-004", question: "¿Dónde saco turno en AMSA o consulto en el CIC?"
+answer: “AMSA es atención primaria; los CIC concentran servicios de salud y sociales. Consultá turnos en [enlace] o por teléfono [número].”
+tags: ["amsa","cic","salud","turnos"]
+“Chau! Dengue”
+uid: "vc-005", question: "¿Qué acciones incluye la campaña Chau! Dengue?"
+answer: “Recomendaciones y cronograma de descacharrado en [enlace]. Eliminá criaderos de mosquitos.”
+tags: ["dengue","mosquito","ambiente","campaña"]
+Deporte y Juventud / Congreso CER
+uid: "vc-006", question: "¿Qué actividades hay en Deporte y Juventud?"
+answer: “Torneos, recreación y eventos. Inscripciones en [enlace]. Congreso CER: iniciativa educativa con agenda en [enlace].”
+tags: ["juventud","deporte","educacion","cer"]
+Economía Social
+uid: "vc-007", question: "¿Qué apoyo brinda Economía Social a emprendimientos?"
+answer: “Herramientas y acompañamiento para proyectos con impacto social. Información en [enlace].”
+tags: ["economia","emprendedor","proyecto","social"]
+Trámites online
+uid: "vc-008", question: "¿Qué trámites puedo hacer online?"
+answer: “Pagos, reclamos, seguimiento de expedientes y más en [enlace].”
+tags: ["tramite","online","digital","pago"]
+Inscripción de proveedores
+uid: "vc-009", question: "¿Cómo me inscribo como proveedor municipal?"
+answer: “Completá el formulario y adjuntá documentación en [enlace].”
+tags: ["proveedor","inscripcion","compra","registro"]
+Cultura / Turismo / Ambiente (Villa Más Limpia)
+id: "vc-010", "vc-011", "vc-012" con preguntas y respuestas sobre agenda, atractivos y separación/recolección según información disponible.
+Efecto: cuando el intent es “rag”, el bot buscará en esta base y responderá si el score ≥ threshold (services/orchestrator/rag.py:78).
+Nota: el dataset RAG se indexa al iniciar la API; si editás el JSON, reiniciá la API para reindexar (services/orchestrator/service.py:190).
+Clasificador de intents (opcional para mejorar enrutamiento a RAG)
+Sumar patrones “rag” (ordenanzas, permisos, trámites clave) en services/orchestrator/intent_classifier.py:1. Ejemplos:
+IntentPattern(intent="rag", keywords=("licenc","conduc"))
+IntentPattern(intent="rag", keywords=("proveedor","inscrip"))
+IntentPattern(intent="rag", keywords=("discap","certific"))
+IntentPattern(intent="rag", keywords=("genero","violeta"))
+IntentPattern(intent="rag", keywords=("dengue",))
+Efecto: mejora recall para RAG sobre esos tópicos, reduciendo caídas innecesarias al LLM.
+No-match y ayuda
+Ajustar no_match_replies y no_match_pick en chatbots/municipal/settings.json:1 para guiar al “ayuda” y sugerir chips.
+La palabra “ayuda” ya dispara un menú fallback (services/orchestrator/rule_engine.py:104).
+Flujo de trabajo de datos
+
+Curación
+Tomar cada subtema de munivilla_data.txt y munivilla_servicios.txt, redactar preguntas canónicas y respuestas oficiales breves (con enlaces/áreas responsables).
+Estructuración
+Crear entradas en knowledge/faqs/municipal_faqs.json:1 con uid únicos, question, answer y 2–4 tags en minúsculas sin tildes.
+Agregar reglas puntuales de “acción directa” (turnos, proveedores, emergencias) en chatbots/municipal/settings.json:1.
+Configurar chips del Portal en menu_suggestions y pre_prompts de estilo.
+Deploy y validación
+Reiniciar API para reindexar RAG.
+Probar consultas de regresión (pagos, turnos, proveedores, discap, dengue, juventud) y medir si responden por reglas/RAG; ajustar rag_threshold si hay falsos positivos/negativos.
+Mantenimiento
+Versionar cambios en Git. Cuando cambien links o políticas, actualizar answer/tags; si se agregan nuevos servicios, sumar entradas y, de ser necesario, nuevos patrones RAG.
+Árbol ASCII del Menú/Navegación
+
+Inicio
+Bienestar y Salud
+Centros: CIC
+Centros: AMSA
+Consumos problemáticos
+Género e Igualdad
+Punto Violeta
+Certificado de Discapacidad
+Campañas: Chau! Dengue
+Educación y Juventud
+Deporte y Juventud
+Educación (Congreso CER)
+Fondo de Asistencia Educativa
+Economía Social
+Trámites y Gestiones
+Trámites Online
+Turnos Online (Licencia de Conducir)
+Inscripción de Proveedores
+Cultura, Turismo y Ambiente
+Cultura (Agenda)
+Turismo (Atractivos)
+Ambiente (Villa Más Limpia)
+Desarrollo Urbano y Comercio
+Obras Privadas
+Planificación
+Comercio
+Información y Contacto
+Noticias y Redes
+Emergencias (911 / 107 / 100)
+Teléfono municipal (435500)
