@@ -709,6 +709,7 @@ async function openSettingsModal(bot) {
   const list = document.getElementById('stg-suggestions');
   const preList = document.getElementById('stg-preprompts');
   const rulesEditBtn = document.getElementById('stg-rules-edit');
+  const rulesDefaultBtn = document.getElementById('stg-rules-default');
   try {
     const settings = await fetchSettings(bot);
     currentSettings = settings;
@@ -813,6 +814,15 @@ async function openSettingsModal(bot) {
   // Abrir editor dedicado de reglas
   if (rulesEditBtn) {
     rulesEditBtn.onclick = () => openRulesModal();
+  }
+
+  // Restablecer reglas a los valores por defecto (vaciar personalizadas)
+  if (rulesDefaultBtn) {
+    rulesDefaultBtn.onclick = () => {
+      currentRules = [];
+      updateRulesSummary();
+      setFeedback('Reglas personalizadas vaciadas (no olvides Guardar).');
+    };
   }
 
   // Restaurar plantilla de ayuda por defecto (sin tocar otros parámetros)

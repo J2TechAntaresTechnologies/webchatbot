@@ -27,6 +27,7 @@ Parámetros (Bot: municipal)
 │   ├─ Respuesta genérica (no‑match): ON/OFF
 │   │   ├─ Lista de respuestas
 │   │   └─ Estrategia (first/random)
+│   ├─ (btn) Usar reglas por defecto (vacía personalizadas)
 │   └─ Ver resumen (conteo/primeras keywords)
 ├─ 4) RAG (Base de conocimiento)
 │   ├─ Ver estado (entradas JSON / TXT, fechas)
@@ -160,6 +161,7 @@ Parámetros
   1) Parámetros → Reglas → “Editar reglas…”.
   2) Cargar keywords (stems), min_matches (opcional), respuesta y origen.
   3) Guardar. Efecto inmediato.
+  4) (Opcional) “Usar reglas por defecto” para vaciar las reglas personalizadas y quedarte solo con las del sistema.
 
 - Añadir entrada RAG (JSON)
   1) Editar `knowledge/faqs/municipal_faqs.json` (JSONC). Ver ejemplo de estructura.
