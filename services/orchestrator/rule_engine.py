@@ -93,24 +93,28 @@ DEFAULT_RULES: Sequence[Rule] = (
     Rule(
         keywords=("ayuda",),
         response=(
-            "Podés navegar con estas opciones:\n"
-            "1. Conocer quiénes somos y cómo trabajamos (respondé opcion 1).\n"
-            "2. Saber qué hace este chatbot y qué cubre (respondé opcion 2).\n"
-            "3. Ver canales de contacto con el municipio respondé opcion 3).\n"
-            "4. Realizar tramites y servicios digitales disponibles (respondé opcion 4).\n"
-            "Escribí el número u opción que prefieras."
+            "Menú principal (escribí una frase o palabra clave):\n"
+            "1) Bienestar y Salud → amsa, cic, consumos, punto violeta, discapacidad, dengue\n"
+            "2) Educación y Juventud → juventud, deporte, congreso cer, economía social\n"
+            "3) Trámites y Gestiones → trámite online, turno licencia, proveedores\n"
+            "4) Cultura, Turismo y Ambiente → agenda cultural, turismo, villa más limpia\n"
+            "5) Desarrollo Urbano y Comercio → obras privadas, planificación, comercio\n"
+            "6) Información y Contacto → contacto, emergencias, horarios\n"
+            "Sugerencia: por ejemplo, escribí ‘turno licencia’ o ‘punto violeta’."
         ),
         source="fallback",
     ),
     Rule(
         keywords=("menu",),
         response=(
-            "Podés navegar con estas opciones:\n"
-            "1. Conocer quiénes somos y cómo trabajamos (respondé opcion 1).\n"
-            "2. Saber qué hace este chatbot y qué cubre (respondé opcion 2).\n"
-            "3. Ver canales de contacto con el municipio respondé opcion 3).\n"
-            "4. Realizar tramites y servicios digitales disponibles (respondé opcion 4).\n"
-            "Escribí el número u opción que prefieras."
+            "Menú principal (escribí una frase o palabra clave):\n"
+            "1) Bienestar y Salud → amsa, cic, consumos, punto violeta, discapacidad, dengue\n"
+            "2) Educación y Juventud → juventud, deporte, congreso cer, economía social\n"
+            "3) Trámites y Gestiones → trámite online, turno licencia, proveedores\n"
+            "4) Cultura, Turismo y Ambiente → agenda cultural, turismo, villa más limpia\n"
+            "5) Desarrollo Urbano y Comercio → obras privadas, planificación, comercio\n"
+            "6) Información y Contacto → contacto, emergencias, horarios\n"
+            "Sugerencia: por ejemplo, escribí ‘turno licencia’ o ‘punto violeta’."
         ),
         source="fallback",
     ),
