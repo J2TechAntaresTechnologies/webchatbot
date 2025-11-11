@@ -201,8 +201,9 @@ class ChatOrchestrator:
         return self._build_response(request, reply, "rag")
 
     async def _fallback(self, request: schema.ChatRequest, settings=None, compose=None) -> schema.ChatResponse:
-        # Modo "grounded only": no invoca LLM si está habilitado por variable de entorno
-        grounded_only = os.getenv("WEBCHATBOT_GROUNDED_ONLY", "0").lower() not in {"", "0", "false", "no"}
+        # Modo "grounded only": no invoca LLM si está habilitado por settings o variable de entorno
+        grounded_only_env = os.getenv("WEBCHATBOT_GROUNDED_ONLY", "0").lower() not in {"", "0", "false", "no"}
+        grounded_only = bool(getattr(settings, "grounded_only", False)) or grounded_only_env
         if grounded_only:
             # Abstenerse de inventar si no hubo reglas ni RAG
             text = (

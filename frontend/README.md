@@ -54,6 +54,10 @@ Acceso externo (sin DNS)
 3. Integrar autenticación municipal y gestión de sesiones.
 4. Añadir componentes reutilizables de diseño municipal y pruebas de usabilidad.
 
+Notas nuevas
+- En el modal de Parámetros (Portal) ahora podés activar “Solo datos (sin LLM si no hay match)”, que hace que el bot se abstenga cuando no hay coincidencias en Reglas/RAG.
+- Además de las FAQs (JSON), la API indexa textos `.txt` desde `00relevamientos_j2/munivilladata` al iniciar; reiniciá la API tras cambios.
+
 Más detalles sobre arquitectura de frontend y lineamientos de diseño en `docs/manual_aprendizaje.md`.
 
 ## Parámetros de Reglas y RAG (Portal)

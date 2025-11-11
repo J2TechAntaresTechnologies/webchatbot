@@ -60,6 +60,12 @@ class BotSettings(BaseModel):
     generation: GenerationSettings = Field(default_factory=GenerationSettings)
     features: FeatureToggles = Field(default_factory=FeatureToggles)
     rag_threshold: float = Field(0.28, ge=0.0, le=1.0, description="Umbral de similitud para RAG [0,1]")
+    grounded_only: bool = Field(
+        False,
+        description=(
+            "Si es True, el orquestador no invoca LLM como fallback: responde solo con Reglas y RAG (abstiene si no hay match)."
+        ),
+    )
     menu_suggestions: list[MenuItem] = Field(default_factory=list)
     pre_prompts: list[str] = Field(default_factory=list, description="Instrucciones iniciales a inyectar antes del mensaje del usuario")
     no_match_replies: list[str] = Field(
@@ -82,6 +88,7 @@ class BotSettings(BaseModel):
             generation=self.generation.clamped(),
             features=self.features,
             rag_threshold=min(max(float(getattr(self, "rag_threshold", 0.28)), 0.0), 1.0),
+            grounded_only=bool(getattr(self, "grounded_only", False)),
             menu_suggestions=self.menu_suggestions,
             pre_prompts=[p for p in self.pre_prompts if isinstance(p, str) and p.strip() != ""],
             no_match_replies=[p.strip() for p in (self.no_match_replies or []) if isinstance(p, str) and p.strip() != ""],

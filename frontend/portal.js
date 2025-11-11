@@ -698,6 +698,7 @@ async function openSettingsModal(bot) {
   const useRag = document.getElementById('stg-userag');
   const enableDefaultRules = document.getElementById('stg-enable-default-rules');
   const ragThreshold = document.getElementById('stg-rag-threshold');
+  const groundedOnly = document.getElementById('stg-grounded-only');
   const genericFieldset = document.getElementById('stg-generic-fieldset');
   const useGeneric = document.getElementById('stg-use-generic');
   const noMatchList = document.getElementById('stg-no-match-list');
@@ -716,6 +717,7 @@ async function openSettingsModal(bot) {
     ragThreshold.value = (typeof settings.rag_threshold === 'number' ? settings.rag_threshold : 0.28).toFixed(2);
     ragThreshold.disabled = !useRag.checked;
     enableDefaultRules.checked = !!(settings.features?.enable_default_rules ?? true);
+    if (groundedOnly) groundedOnly.checked = !!(settings.grounded_only ?? false);
     if (noMatchPick) {
       noMatchPick.value = settings.no_match_pick === 'random' ? 'random' : 'first';
     }
@@ -839,6 +841,7 @@ async function openSettingsModal(bot) {
         use_rag: !!useRag.checked,
         enable_default_rules: !!enableDefaultRules.checked,
       },
+      grounded_only: groundedOnly ? !!groundedOnly.checked : false,
       rag_threshold: thr,
       menu_suggestions: collectSuggestions(list),
       pre_prompts: collectPreprompts(preList),
@@ -869,6 +872,7 @@ async function openSettingsModal(bot) {
       useRules.checked = !!(settings.features?.use_rules ?? true);
       useRag.checked = !!(settings.features?.use_rag ?? true);
       enableDefaultRules.checked = !!(settings.features?.enable_default_rules ?? true);
+      if (groundedOnly) groundedOnly.checked = !!(settings.grounded_only ?? false);
       ragThreshold.value = (typeof settings.rag_threshold === 'number' ? settings.rag_threshold : 0.28).toFixed(2);
       ragThreshold.disabled = !useRag.checked;
       if (bot?.id === 'municipal') {

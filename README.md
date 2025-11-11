@@ -52,6 +52,7 @@ docs/
 - Tests unitarios cubren reglas, RAG, fallback y handoff; `./bin/python -m pytest` para ejecutar.
 - Frontend con portal y variantes: `frontend/index.html` (Portal de Chatbots), `frontend/municipal.html` (Chatbot Municipal) y `frontend/mar2.html` (MAR2, conversación libre) con integración vía `fetch`.
 - Portal incluye: editor de parámetros (guardar/leer vía API), editor de reglas, ayuda integrada y gestor de temas.
+  - Nuevo: toggle “Solo datos (sin LLM si no hay match)” para abstener el LLM y responder solo con Reglas/RAG.
 
 ## Parámetros: Reglas y RAG (cómo funciona)
 - Orden de decisión del orquestador: Reglas (FAQ/Fallback) → RAG → Genérico (si está habilitado y no hubo match) → LLM.
@@ -73,6 +74,7 @@ docs/
   - `generation`: `temperature`, `top_p`, `max_tokens`.
   - `features`: `use_rules`, `use_rag`, `enable_default_rules`, `use_generic_no_match` (este último muestra respuestas genéricas opcionales cuando no hay match).
   - `rag_threshold`: umbral RAG por bot.
+  - `grounded_only`: si es true, el orquestador no invoca LLM cuando no hay match (abstiene y sugiere ayuda).
   - `menu_suggestions`: lista de atajos (label + message) visibles en el cliente.
   - `pre_prompts`: instrucciones que se inyectan antes del mensaje del usuario.
   - `rules`: reglas personalizadas (enabled, keywords, response, source=faq|fallback).
@@ -111,6 +113,7 @@ Atajos con Make (equivalentes a los pasos anteriores):
 Ejecución combinada (API + frontend) en una sola orden:
 - `./start.sh` inicia ambos procesos (usa `tmux` si está instalado). Detener con `Ctrl+C` o cerrando la sesión de tmux.
 - `./start_noverbose.sh` hace lo mismo, pero reduce el ruido de logs (Uvicorn `--log-level warning` y backend LLM con `GGML_LOG_LEVEL=ERROR`, `LLAMA_LOG_LEVEL=ERROR`). Útil cuando usás `llama-cpp-python` con modelos GGUF.
+  - Modo “grounded” via env: `WEBCHATBOT_GROUNDED_ONLY=1 ./start_noverbose.sh`.
 
 Probar el endpoint vía cURL (sin frontend):
 - Modo web (con reglas/FAQ/RAG):
@@ -192,6 +195,10 @@ Sugerencias de seguridad (incluso en pruebas):
 - `WEBCHATBOT_ALLOWED_ORIGINS`: lista de orígenes permitidos para CORS (coma‑separados o `*`).
 - `window.WEBCHATBOT_API_BASE_URL` (frontend): define la URL base de la API cuando frontend y backend no comparten host/puerto.
 - LLM: `LLM_MODEL_PATH`, `LLM_MAX_TOKENS`, `LLM_TEMPERATURE`, `LLM_TOP_P`, `LLM_CONTEXT_WINDOW`.
+ - Grounded: `WEBCHATBOT_GROUNDED_ONLY=1` fuerza abstener LLM y responder solo con Reglas/RAG.
+
+Base de conocimiento
+- Además de `knowledge/faqs/municipal_faqs.json`, se indexan textos `.txt` desde `00relevamientos_j2/munivilladata` al iniciar la API. Reiniciar tras editar/añadir.
 - Logs (llama.cpp/ggml): `GGML_LOG_LEVEL` y `LLAMA_LOG_LEVEL` admiten `ERROR|WARN|INFO|DEBUG`. El script `start_noverbose.sh` las fija a `ERROR` para minimizar mensajes en consola.
 
 Nota sobre temas (frontend)

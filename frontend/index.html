@@ -46,6 +46,7 @@
               RAG threshold
               <input id="stg-rag-threshold" name="rag_threshold" type="number" step="0.01" min="0" max="1" />
             </label>
+            <label><input id="stg-grounded-only" type="checkbox" /> Solo datos (sin LLM si no hay match)</label>
           </fieldset>
           <fieldset id="stg-generic-fieldset" hidden>
             <legend>Respuesta genérica (no-match)</legend>
@@ -121,10 +122,16 @@
             <li><strong>Usar RAG</strong>: permite buscar en la base `knowledge/faqs/municipal_faqs.json` cuando el intent es RAG.</li>
             <li><strong>RAG threshold</strong>: umbral de similitud (0–1). Recomendado 0.20–0.40. Más bajo = más recall (y posibles falsos positivos); más alto = más precisión (pero puede no devolver resultados).</li>
             <li><strong>Incluir reglas predefinidas</strong>: evalúa tus reglas primero y luego las default del sistema.</li>
+            <li><strong>Solo datos</strong>: si está activado, el bot no invoca el LLM cuando no hay match; responde una abstención y sugiere "ayuda".</li>
           </ul>
           <p><strong>Orden de decisión</strong></p>
           <ul>
             <li>Reglas (si intent es FAQ/Smalltalk y “Usar reglas” está ON) → RAG (si intent es RAG y “Usar RAG” está ON) → Genérico (si está ON y no hubo match) → LLM.</li>
+          </ul>
+          <p><strong>Base de conocimiento</strong></p>
+          <ul>
+            <li>Además de las FAQs (JSON), se indexan textos desde <code>00relevamientos_j2/munivilladata</code> al iniciar la API.</li>
+            <li>Tras editar/añadir .txt, reiniciá la API para reindexar.</li>
           </ul>
           <p><strong>Respuesta genérica (no‑match)</strong></p>
           <ul>

@@ -28,7 +28,7 @@ Este documento resume, con foco práctico, dónde viven los prompts y parámetro
   - POST `/chatbots/{id}/settings/reset?channel=...` → restablece a defaults.
 
 - Base de conocimiento (RAG)
-  - Dataset por defecto: `knowledge/faqs/municipal_faqs.json` (admite comentarios JSONC).
+  - Dataset por defecto: `knowledge/faqs/municipal_faqs.json` (admite comentarios JSONC). Además, se indexan `.txt` curatoriales desde `00relevamientos_j2/munivilladata` al iniciar la API.
   - Carga/uso: `services/orchestrator/rag.py` (umbral de similitud léxica por defecto `0.28`).
   - El loader elimina comentarios antes de parsear; herramientas como `jq` no soportan comentarios.
 
