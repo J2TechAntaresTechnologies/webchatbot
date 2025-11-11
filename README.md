@@ -110,6 +110,7 @@ Atajos con Make (equivalentes a los pasos anteriores):
 
 Ejecución combinada (API + frontend) en una sola orden:
 - `./start.sh` inicia ambos procesos (usa `tmux` si está instalado). Detener con `Ctrl+C` o cerrando la sesión de tmux.
+- `./start_noverbose.sh` hace lo mismo, pero reduce el ruido de logs (Uvicorn `--log-level warning` y backend LLM con `GGML_LOG_LEVEL=ERROR`, `LLAMA_LOG_LEVEL=ERROR`). Útil cuando usás `llama-cpp-python` con modelos GGUF.
 
 Probar el endpoint vía cURL (sin frontend):
 - Modo web (con reglas/FAQ/RAG):
@@ -191,6 +192,10 @@ Sugerencias de seguridad (incluso en pruebas):
 - `WEBCHATBOT_ALLOWED_ORIGINS`: lista de orígenes permitidos para CORS (coma‑separados o `*`).
 - `window.WEBCHATBOT_API_BASE_URL` (frontend): define la URL base de la API cuando frontend y backend no comparten host/puerto.
 - LLM: `LLM_MODEL_PATH`, `LLM_MAX_TOKENS`, `LLM_TEMPERATURE`, `LLM_TOP_P`, `LLM_CONTEXT_WINDOW`.
+- Logs (llama.cpp/ggml): `GGML_LOG_LEVEL` y `LLAMA_LOG_LEVEL` admiten `ERROR|WARN|INFO|DEBUG`. El script `start_noverbose.sh` las fija a `ERROR` para minimizar mensajes en consola.
+
+Nota sobre temas (frontend)
+- Los temas y preferencias (incluida la visibilidad del modo libre MAR2) se guardan en `localStorage` por origen (esquema + host + puerto). Es normal que `http://localhost:5173` y `http://0.0.0.0:5173` no compartan configuraciones.
 
 ## Pruebas
 1. Instalar dependencias de desarrollo: `make install-dev` (incluye `pytest` y `pytest-asyncio`).

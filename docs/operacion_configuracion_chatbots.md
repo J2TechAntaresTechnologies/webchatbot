@@ -35,6 +35,7 @@ Este documento resume, con foco práctico, dónde viven los prompts y parámetro
 - Logs y persistencia de conversaciones (estado actual)
   - No se guardan transcripts de conversación ni prompts/completions en disco o BD.
   - El adaptador LLM registra avisos/errores a stdout (Uvicorn/console): `services/llm_adapter/client.py` (logger).
+  - Para reducir ruido de logs al ejecutar modelos GGUF (llama.cpp), podés usar el script `./start_noverbose.sh`, que ajusta `GGML_LOG_LEVEL=ERROR` / `LLAMA_LOG_LEVEL=ERROR` y baja el nivel de Uvicorn.
 
 ## 2) Configuración de chatbots: consejos y tutorial paso a paso
 
@@ -46,6 +47,7 @@ Este documento resume, con foco práctico, dónde viven los prompts y parámetro
      - Comportamiento: `usar reglas` (FAQ/reglas), `usar RAG`, `RAG threshold` (umbral 0–1, recomendado 0.20–0.40), `respuesta genérica`, `incluir reglas por defecto`.
      - Menú (solo municipal): etiquetas y mensajes para chips.
      - Pre-prompts: agrega instrucciones, una por fila (se inyectan como lista con viñetas).
+     - Visibilidad del Portal: en la Configuración de tema (botón "Configuración" en la barra superior del Portal), tildá o destildá "Mostrar modo libre (MAR2) en el portal" para ocultar esa variante de la pantalla principal.
      - Reglas personalizadas: alta/baja/edición de `keywords` (separadas por coma), `response` (texto) y `source` (`faq` o `fallback`) por regla. Podés eliminar reglas desde el botón ✕. Comportamiento: si `Incluir reglas predefinidas` está activo, se aplican tus reglas primero (prioridad) y luego `DEFAULT_RULES`. Si está desactivado, solo tus reglas.
      - Respuesta genérica (solo Municipal): activá “Responder genérico si no hay coincidencia” y cargá múltiples textos genéricos (una fila por respuesta). Elegí la estrategia: `Siempre la primera` o `Al azar`.
      - (Clasificación a RAG) Para que ciertas consultas ejecuten RAG, edita `services/orchestrator/intent_classifier.py` y agrega `IntentPattern(intent="rag", keywords=(...))` con stems relevantes (ej.: `( "ambiente", "permis" )`, `( "poda", )`).

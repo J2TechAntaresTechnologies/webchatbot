@@ -40,6 +40,7 @@ Acceso externo (sin DNS)
 - Persistencia:
   - Los temas se guardan en `localStorage` del navegador bajo la clave `webchatbot_themes` y el tema activo en `webchatbot_active_theme`.
   - El tema activo se aplica automáticamente en todas las vistas (`index.html`, `municipal.html`, `mar2.html`).
+  - Nota: `localStorage` es por origen (esquema + host + puerto). Ej.: `http://localhost:5173` y `http://0.0.0.0:5173` no comparten preferencias.
 
 ## Parámetros visibles en MAR2
 - La pantalla `mar2.html` lee la configuración del bot MAR2 desde la API y muestra un resumen arriba del cuadro de chat:

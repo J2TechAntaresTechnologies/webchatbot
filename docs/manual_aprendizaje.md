@@ -11,7 +11,7 @@ Este manual orienta a nuevas personas del equipo para comprender, extender y man
    - Revisar `docs/architecture.md` para ubicar cada módulo en el flujo end-to-end.
 2. **Manos a la obra (día 1)**
    - Crear entorno virtual y ejecutar `make install-dev`.
-   - Levantar la API (`uvicorn services.api.main:app --reload`) y el frontend (`python -m http.server --directory frontend 5173`).
+   - Levantar la API (`uvicorn services.api.main:app --reload`) y el frontend (`python -m http.server --directory frontend 5173`). Alternativa con menos logs: `./start_noverbose.sh` (lanza API + frontend, ajusta niveles de log de Uvicorn y llama.cpp).
    - Probar consultas típicas: horarios, reclamos, ordenanzas.
 3. **Profundizar (semana 1)**
    - Leer las pruebas unitarias en `tests/unit/` y añadir un caso nuevo.
