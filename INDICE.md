@@ -15,6 +15,9 @@ Nota: este índice cubre sólo archivos propios del proyecto. Se excluyen docume
 - `docs/llm_con_contexto_y_modo_solo_datos.md` — Generación anclada a la KB (LLM con contexto) y modo “Solo datos”.
   - Temario: Objetivo; Componentes; Activación y defaults; Flujo actualizado; Pasos para agregar cobertura (Reglas, RAG JSON/TXT, intents); Tuning; Ejemplos; Referencias.
 
+- `docs/parametros_menu_ux.md` — Especificación del menú de parámetros y subventanas.
+  - Temario: Estructura del menú; Subventanas (Reglas, RAG JSON/TXT, Intents, Ayuda); Mapeo UI→JSON/archivos; Navegación ASCII; Paso a paso por caso.
+
 - `docs/ragbag.,md` — RAG y FAQ — Guía técnica del proyecto.
   - Temario: Qué es RAG/FAQ; nomenclaturas; dónde se parametrizan; flujos por separado y combinados; endpoints y ejemplos; consejos de afinado; referencias a archivos/líneas.
 
