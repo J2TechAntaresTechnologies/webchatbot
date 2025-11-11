@@ -62,9 +62,14 @@ DEFAULT_PATTERNS: Sequence[IntentPattern] = (
     # Munivilla (servicios): encaminar consultas típicas a RAG
     IntentPattern(intent="rag", keywords=("licenc", "conduc"), confidence=0.65),
     IntentPattern(intent="rag", keywords=("proveedor", "inscrip"), confidence=0.65),
+    IntentPattern(intent="rag", keywords=("proveedor", "inscrib"), confidence=0.65),
+    IntentPattern(intent="rag", keywords=("tramit", "online"), confidence=0.65),
     IntentPattern(intent="rag", keywords=("discap", "certific"), confidence=0.65),
     IntentPattern(intent="rag", keywords=("genero", "violeta"), confidence=0.65),
     IntentPattern(intent="rag", keywords=("dengue",), confidence=0.65),
+    # Atajos a reglas/FAQ para consultas de emergencia y policía
+    IntentPattern(intent="faq", keywords=("emergenc",), confidence=0.8),
+    IntentPattern(intent="faq", keywords=("polic",), confidence=0.8),
 )
 
 # ================================================================

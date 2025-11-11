@@ -125,8 +125,24 @@ class ChatOrchestrator:
                     response = getattr(rc, "response", None) if not isinstance(rc, dict) else rc.get("response")
                     source = getattr(rc, "source", "faq") if not isinstance(rc, dict) else rc.get("source", "faq")
                     enabled = getattr(rc, "enabled", True) if not isinstance(rc, dict) else rc.get("enabled", True)
+                    min_matches = getattr(rc, "min_matches", None) if not isinstance(rc, dict) else rc.get("min_matches")
                     if enabled and keywords and isinstance(response, str) and response.strip():
-                        custom_rules.append(Rule(keywords=tuple(keywords), response=response.strip(), source=("fallback" if source == "fallback" else "faq")))
+                        # Normalizar min_matches (entero positivo) si se provee
+                        mm = None
+                        try:
+                            if min_matches is not None:
+                                mm_val = int(min_matches)
+                                mm = mm_val if mm_val > 0 else None
+                        except Exception:
+                            mm = None
+                        custom_rules.append(
+                            Rule(
+                                keywords=tuple(keywords),
+                                response=response.strip(),
+                                source=("fallback" if source == "fallback" else "faq"),
+                                min_matches=mm,
+                            )
+                        )
                 rules: list[Rule] = []
                 # Priorizar reglas personalizadas (más específicas) por delante de las default
                 rules.extend(custom_rules)
