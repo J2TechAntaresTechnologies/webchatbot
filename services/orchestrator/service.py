@@ -104,9 +104,11 @@ class ChatOrchestrator:
         source: ResponseSource,
         escalated: bool = False,
     ) -> schema.ChatResponse:
+        # Sanitizar salida en todos los casos (Reglas/RAG/LLM)
+        clean = _sanitize_llm_output(reply)
         return schema.ChatResponse(
             session_id=request.session_id,
-            reply=reply,
+            reply=clean,
             source=source,
             escalated=escalated,
         )
