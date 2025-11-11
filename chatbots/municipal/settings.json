@@ -2,7 +2,7 @@
   "generation": {
     "temperature": 0.7,
     "top_p": 0.9,
-    "max_tokens": 256
+    "max_tokens": 200
   },
   "features": {
     "use_rules": true,
@@ -12,25 +12,24 @@
   },
   "rag_threshold": 0.28,
   "menu_suggestions": [
-    {
-      "label": "Pagar impuestos",
-      "message": "¿Cómo pago mis impuestos?"
-    },
-    {
-      "label": "Sacar turno",
-      "message": "Quiero sacar un turno"
-    },
-    {
-      "label": "Hacer reclamo",
-      "message": "Quiero hacer un reclamo"
-    },
-    {
-      "label": "Ayuda",
-      "message": "ayuda"
-    }
+    { "label": "Trámites online", "message": "¿Qué trámites puedo hacer online?" },
+    { "label": "Turnos licencia de conducir", "message": "Quiero sacar un turno para licencia de conducir" },
+    { "label": "Inscripción de proveedores", "message": "¿Cómo me inscribo como proveedor municipal?" },
+    { "label": "Punto Violeta", "message": "¿Qué es el Punto Violeta y dónde está?" },
+    { "label": "Consumos problemáticos", "message": "Necesito ayuda por consumos problemáticos" },
+    { "label": "Certificado de discapacidad", "message": "¿Cómo tramito el Certificado de Discapacidad?" },
+    { "label": "Cultura y agenda", "message": "¿Qué actividades culturales hay este mes?" },
+    { "label": "Turismo", "message": "¿Qué atractivos turísticos tiene la ciudad?" },
+    { "label": "Ambiente (Villa Más Limpia)", "message": "¿Cómo es la separación y recolección?" },
+    { "label": "Economía social", "message": "¿Qué apoyo brinda Economía Social?" },
+    { "label": "Obras privadas", "message": "¿Cómo son los trámites de obras privadas?" },
+    { "label": "Contacto y emergencias", "message": "Necesito números de contacto y emergencias" },
+    { "label": "Ayuda", "message": "ayuda" }
   ],
   "pre_prompts": [
-    "responde con frases cortas , no mas de dos renglones"
+    "Responde con frases cortas y claras; usá viñetas cuando enumeres.",
+    "Preferí fuentes oficiales y mencioná el área responsable cuando aplique.",
+    "Ante emergencias: indicá 911 (Policía), 107 (Hospital), 100 (Bomberos)."
   ],
   "no_match_replies": [
     "No tengo una respuesta exacta para eso. Podés escribir 'ayuda' para ver el menú o reformular en pocas palabras.",
@@ -42,18 +41,44 @@
   "rules": [
     {
       "enabled": true,
-      "keywords": [
-        "impuestos"
-      ],
-      "response": "Podes pagar impuestos en www.impuestosvilla.com",
+      "keywords": ["emergenc", "polic", "bombero", "accident", "hospital"],
+      "response": "Emergencias: Policía 911, Hospital 107, Bomberos 100. Teléfono municipal: 435500.",
+      "source": "fallback"
+    },
+    {
+      "enabled": true,
+      "keywords": ["turno", "licenc", "conduc"],
+      "response": "Solicitá o reprogramá tu turno de Licencia de Conducir en turnos.municipio.gob.",
       "source": "faq"
     },
     {
       "enabled": true,
-      "keywords": [
-        "perro"
-      ],
-      "response": "toda la informacion sobre mascotas en:\n\nwww.mascotas.pop",
+      "keywords": ["proveedor", "inscrip", "compra"],
+      "response": "La inscripción de proveedores se realiza en proveedores.municipio.gob o en Atención Vecinal.",
+      "source": "faq"
+    },
+    {
+      "enabled": true,
+      "keywords": ["certific", "discap"],
+      "response": "Consultá requisitos y turnos para el Certificado de Discapacidad en salud.municipio.gob o en Atención Ciudadana.",
+      "source": "faq"
+    },
+    {
+      "enabled": true,
+      "keywords": ["violeta", "genero", "violenc"],
+      "response": "Punto Violeta brinda escucha y contención. Consultá ubicación/horarios en genero.municipio.gob o acercate a Atención Ciudadana.",
+      "source": "faq"
+    },
+    {
+      "enabled": true,
+      "keywords": ["consumo", "adiccion"],
+      "response": "La Dirección de Consumos Problemáticos ofrece orientación y acompañamiento. Solicitá turno en salud.municipio.gob o en Atención Ciudadana.",
+      "source": "faq"
+    },
+    {
+      "enabled": true,
+      "keywords": ["obra", "privad", "plano"],
+      "response": "Para trámites de obras privadas consultá requisitos y presentaciones en obras.municipio.gob o en la oficina de Obras Privadas.",
       "source": "faq"
     }
   ]

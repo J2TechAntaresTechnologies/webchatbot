@@ -170,5 +170,77 @@ Buenas prácticas
     "answer": "Consultá el calendario por barrio en residuos.municipio.gob o en Atención Vecinal.",
     // tags — Etiquetas semánticas para mejorar el matching (2–4, minúsculas)
     "tags": ["residuos", "recoleccion", "servicios"]
+  },
+  {
+    "uid": "vc-001",
+    "question": "¿Qué es y dónde está el Punto Violeta?",
+    "answer": "Punto Violeta brinda escucha y contención en temas de género y diversidad. Consultá ubicación y horarios en genero.municipio.gob o en Atención Ciudadana.",
+    "tags": ["genero", "violeta", "igualdad", "apoyo"]
+  },
+  {
+    "uid": "vc-002",
+    "question": "¿Dónde pedir ayuda por consumos problemáticos?",
+    "answer": "El municipio ofrece orientación y acompañamiento profesional en Consumos Problemáticos. Solicitá turno en salud.municipio.gob o consultá en Atención Ciudadana.",
+    "tags": ["consumo", "adiccion", "salud", "apoyo"]
+  },
+  {
+    "uid": "vc-003",
+    "question": "¿Cómo tramitar el Certificado de Discapacidad?",
+    "answer": "Trámite con evaluación interdisciplinaria. Revisá requisitos y sacá turno en salud.municipio.gob o acercate a Atención Ciudadana con documentación médica.",
+    "tags": ["certificado", "discapacidad", "tramite"]
+  },
+  {
+    "uid": "vc-004",
+    "question": "¿Cómo saco turno en AMSA o consulto en el CIC?",
+    "answer": "AMSA es atención primaria; los CIC concentran salud y desarrollo social. Gestión de turnos y consultas en salud.municipio.gob o en Atención Ciudadana.",
+    "tags": ["amsa", "cic", "salud", "turnos"]
+  },
+  {
+    "uid": "vc-005",
+    "question": "¿Qué acciones incluye la campaña Chau! Dengue?",
+    "answer": "Recomendaciones, cronograma de descacharrado y prevención del mosquito. Más información en ambiente.municipio.gob.",
+    "tags": ["dengue", "mosquito", "ambiente", "campana"]
+  },
+  {
+    "uid": "vc-006",
+    "question": "¿Qué actividades hay en Deporte y Juventud y qué es el Congreso CER?",
+    "answer": "Deporte y Juventud organiza torneos y actividades. El Congreso CER es un encuentro educativo con agenda publicada en educacion.municipio.gob.",
+    "tags": ["juventud", "deporte", "educacion", "cer"]
+  },
+  {
+    "uid": "vc-007",
+    "question": "¿Qué apoyo brinda Economía Social a emprendimientos?",
+    "answer": "Herramientas y acompañamiento para proyectos con impacto social. Información y requisitos en economiasocial.municipio.gob.",
+    "tags": ["economia", "emprendedor", "proyecto", "social"]
+  },
+  {
+    "uid": "vc-008",
+    "question": "¿Qué trámites puedo hacer online?",
+    "answer": "Pagos de tasas, reclamos, turnos, habilitaciones y más desde tramites.municipio.gob.",
+    "tags": ["tramite", "online", "digital", "pago"]
+  },
+  {
+    "uid": "vc-009",
+    "question": "¿Cómo me inscribo como proveedor municipal?",
+    "answer": "Completá el registro y adjuntá documentación en proveedores.municipio.gob o solicitá asistencia en Atención Vecinal.",
+    "tags": ["proveedor", "inscripcion", "compra", "registro"]
+  },
+  {
+    "uid": "vc-010",
+    "question": "¿Dónde veo la agenda cultural?",
+    "answer": "La programación de Cultura se publica en cultura.municipio.gob y en redes oficiales.",
+    "tags": ["cultura", "agenda", "eventos"]
+  },
+  {
+    "uid": "vc-011",
+    "question": "¿Qué atractivos turísticos tiene la ciudad?",
+    "answer": "Conocé los circuitos y atractivos en turismo.municipio.gob o en la oficina de Turismo.",
+    "tags": ["turismo", "atractivos", "visitas"]
+  },
+  {
+    "uid": "vc-012",
+    "question": "¿Cómo funciona Villa Más Limpia (separación y recolección)?",
+    "answer": "Separá residuos secos y húmedos según calendario. Consultá puntos y días en ambiente.municipio.gob.",
+    "tags": ["ambiente", "residuos", "separacion"]
   }
 ]

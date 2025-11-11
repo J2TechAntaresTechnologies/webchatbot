@@ -59,6 +59,12 @@ DEFAULT_PATTERNS: Sequence[IntentPattern] = (
     # Patrones RAG adicionales (stems) para habilitar búsquedas sobre permisos de poda/ambiente
     IntentPattern(intent="rag", keywords=("ambiente", "permis"), confidence=0.65),
     IntentPattern(intent="rag", keywords=("poda",), confidence=0.65),
+    # Munivilla (servicios): encaminar consultas típicas a RAG
+    IntentPattern(intent="rag", keywords=("licenc", "conduc"), confidence=0.65),
+    IntentPattern(intent="rag", keywords=("proveedor", "inscrip"), confidence=0.65),
+    IntentPattern(intent="rag", keywords=("discap", "certific"), confidence=0.65),
+    IntentPattern(intent="rag", keywords=("genero", "violeta"), confidence=0.65),
+    IntentPattern(intent="rag", keywords=("dengue",), confidence=0.65),
 )
 
 # ================================================================
