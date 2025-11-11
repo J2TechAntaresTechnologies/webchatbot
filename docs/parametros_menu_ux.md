@@ -21,7 +21,7 @@ Parámetros (Bot: municipal)
 │   ├─ Temperature
 │   ├─ Top‑p
 │   ├─ Max tokens
-│   └─ Pre‑prompts (editor inline)
+│   └─ Pre‑prompts (editor inline) + (btn) Usar pre‑prompts por defecto
 ├─ 3) Reglas (FAQ/Fallback)
 │   ├─ Abrir “Editor de reglas…” (subventana)
 │   ├─ Respuesta genérica (no‑match): ON/OFF
@@ -154,7 +154,7 @@ Parámetros
 
 - Ajustar generación (LLM)
   1) Parámetros → Generación. Ajustar temperature/top_p/max_tokens.
-  2) `pre_prompts`: agregar líneas de estilo/seguridad.
+  2) `pre_prompts`: agregar líneas de estilo/seguridad o pulsar “Usar pre‑prompts por defecto” para restablecerlos.
 
 - Agregar regla rápida
   1) Parámetros → Reglas → “Editar reglas…”.

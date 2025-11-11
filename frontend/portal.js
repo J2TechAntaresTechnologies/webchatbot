@@ -779,6 +779,7 @@ async function openSettingsModal(bot) {
   }
 
   const addPreBtn = document.getElementById('stg-add-preprompt');
+  const prepromptsDefaultBtn = document.getElementById('stg-preprompts-default');
   addPreBtn.onclick = () => {
     const row = document.createElement('div');
     row.className = 'row';
@@ -792,6 +793,22 @@ async function openSettingsModal(bot) {
     row.appendChild(del);
     preList.appendChild(row);
   };
+
+  // Restaurar pre‑prompts por defecto
+  if (prepromptsDefaultBtn) {
+    prepromptsDefaultBtn.onclick = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/chatbots/${encodeURIComponent(bot.id)}/defaults?channel=${encodeURIComponent(bot.channel || '')}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const defs = await res.json();
+        renderPrepromptsEditor(preList, Array.isArray(defs.pre_prompts) ? defs.pre_prompts : []);
+        setFeedback('Pre‑prompts restablecidos (no olvides Guardar).');
+      } catch (e) {
+        console.error('No se pudieron cargar defaults', e);
+        setFeedback('No se pudieron cargar los pre‑prompts por defecto.', true);
+      }
+    };
+  }
 
   // Abrir editor dedicado de reglas
   if (rulesEditBtn) {
