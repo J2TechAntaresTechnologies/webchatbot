@@ -9,6 +9,7 @@ from services.chatbots.models import (
     load_settings,
     reset_settings,
     save_settings,
+    defaults_for,
 )
 
 
@@ -35,6 +36,12 @@ def post_reset(bot_id: str, channel: str | None = None) -> BotSettings:
         return reset_settings(bot_id, channel=channel)
     except Exception as exc:  # pragma: no cover - errores de IO
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+@router.get("/{bot_id}/defaults", response_model=BotSettings)
+def get_defaults(bot_id: str, channel: str | None = None) -> BotSettings:
+    """Devuelve los valores por defecto (sin persistirlos)."""
+    return defaults_for(bot_id, channel)
 
 
 # ================================================================

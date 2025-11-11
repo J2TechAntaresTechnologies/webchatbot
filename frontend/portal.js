@@ -700,6 +700,7 @@ async function openSettingsModal(bot) {
   const ragThreshold = document.getElementById('stg-rag-threshold');
   const groundedOnly = document.getElementById('stg-grounded-only');
   const helpTemplate = document.getElementById('stg-help-template');
+  const helpDefaultBtn = document.getElementById('stg-help-default');
   const allowedDomains = document.getElementById('stg-allowed-domains');
   const genericFieldset = document.getElementById('stg-generic-fieldset');
   const useGeneric = document.getElementById('stg-use-generic');
@@ -778,6 +779,22 @@ async function openSettingsModal(bot) {
   // Abrir editor dedicado de reglas
   if (rulesEditBtn) {
     rulesEditBtn.onclick = () => openRulesModal();
+  }
+
+  // Restaurar plantilla de ayuda por defecto (sin tocar otros parámetros)
+  if (helpDefaultBtn && helpTemplate) {
+    helpDefaultBtn.onclick = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/chatbots/${encodeURIComponent(bot.id)}/defaults?channel=${encodeURIComponent(bot.channel || '')}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const defs = await res.json();
+        helpTemplate.value = defs.help_template || '';
+        setFeedback('Plantilla de ayuda restablecida (no olvides Guardar).');
+      } catch (e) {
+        console.error('No se pudo cargar defaults', e);
+        setFeedback('No se pudo cargar la plantilla por defecto.', true);
+      }
+    };
   }
 
   // Habilitar/deshabilitar threshold junto con el toggle de RAG
