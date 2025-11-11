@@ -12,6 +12,9 @@ Nota: este índice cubre sólo archivos propios del proyecto. Se excluyen docume
 - `docs/operacion_configuracion_chatbots.md` — Operación, configuración de chatbots y gestión de prompts.
   - Temario: Dónde se alojan prompts/params/archivos persistentes; Tutorial paso a paso (Portal/API/archivos) con consejos; Efecto de logs y parámetros en el bot; Guía de prompts (estrategias, versionado y archivos sugeridos); Apéndice de rutas y referencias.
 
+- `docs/llm_con_contexto_y_modo_solo_datos.md` — Generación anclada a la KB (LLM con contexto) y modo “Solo datos”.
+  - Temario: Objetivo; Componentes; Activación y defaults; Flujo actualizado; Pasos para agregar cobertura (Reglas, RAG JSON/TXT, intents); Tuning; Ejemplos; Referencias.
+
 - `docs/ragbag.,md` — RAG y FAQ — Guía técnica del proyecto.
   - Temario: Qué es RAG/FAQ; nomenclaturas; dónde se parametrizan; flujos por separado y combinados; endpoints y ejemplos; consejos de afinado; referencias a archivos/líneas.
 
@@ -35,12 +38,14 @@ Nota: este índice cubre sólo archivos propios del proyecto. Se excluyen docume
 
 - `frontend/README.md` — Uso del portal y clientes web.
   - Temario: Uso rápido; Temas (colores) y persistencia; Parámetros visibles en MAR2; Próximos pasos.
+  - Notas nuevas: toggle “Solo datos (sin LLM si no hay match)”; indexación automática de `.txt` en `00relevamientos_j2/munivilladata`.
 
 - `docs/visualizacion.md` — Guía de visualización (frontend).
   - Temario: Tamaños y layout del chat; colores y tipografía (variables/temas); estilos de burbujas, inputs, botones; saltos de línea; portal y modal de parámetros; rutas/líneas de referencia.
 
 - `knowledge/README.md` — Guía de la base de conocimiento.
   - Temario: Estructura actual; Formato de FAQs (JSON); Cómo extender la base; Buenas prácticas; Validación rápida; Próximos pasos.
+  - Notas nuevas: indexación de `.txt` curatoriales y generación con contexto (grounded).
 
 - `chatbots/README.md` — Estructura del directorio de variantes.
   - Temario: Portada y estructura sugerida de `chatbots/<id>/` (config, reglas, RAG por variante).
@@ -61,6 +66,19 @@ Nota: este índice cubre sólo archivos propios del proyecto. Se excluyen docume
 
 - `parametrizacion de bots.txt` — Parámetros y persistencia por bot (municipal, mar2).
   - Temario: Alcance y persistencia; Endpoints (`GET/PUT/POST reset`); Generación (temperature, top-p, max tokens) con rangos y sugerencias; Consejos rápidos por variante; Comportamiento (usar reglas/RAG); Menú de sugerencias; Botones del modal (guardar/restablecer/cancelar); Valores estándar por variante; Aplicación técnica (límites y enforcement en backend); Notas útiles.
+
+- `docs/plan_pruebas_mejora.md` — Plan de pruebas e indicadores de mejora.
+  - Temario: Objetivos; Preparación; Métricas; Matriz de casos; Indicadores; Diagnóstico y tuning; Robustez; Backlog.
+
+- `baseknow.md` — Qué es la base de conocimiento (KB) y cómo se aplica.
+  - Temario: Estructura, parámetros, flujos, buenas prácticas, ampliación.
+
+- Paquete Munivilla (en `docs/`):
+  - `munivilladata_propuesta_menu.md` — Propuesta de menú y parámetros.
+  - `munivilladata_integracion_FAQ_RAG.md` — Integración de datos (Reglas/RAG) con ejemplos.
+  - `munivilladata_flujos.md` — Diagramas de flujo de datos.
+  - `munivilladata_tutorial_bot.md` — Tutorial de funcionamiento y parametrización.
+  - `munivilladata_setup_inicial.md` — Setup inicial recomendado.
 
 ## Guías in-code (comentarios de referencia)
 

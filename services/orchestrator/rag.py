@@ -128,6 +128,26 @@ class SimpleRagResponder:
             return None
         return best_answer
 
+    async def topk(self, message: str, k: int = 3) -> list[tuple[KnowledgeEntry, float]]:
+        """Devuelve las K entradas más similares con sus scores.
+
+        No aplica el threshold interno; el consumidor decide el umbral.
+        """
+        if k <= 0:
+            return []
+        query_vector = self._embed_text(message)
+        if not query_vector:
+            return []
+        scored: list[tuple[int, float]] = []
+        for idx, vector in enumerate(self._vectors):
+            score = _cosine_similarity(query_vector, vector)
+            scored.append((idx, score))
+        scored.sort(key=lambda t: t[1], reverse=True)
+        out: list[tuple[KnowledgeEntry, float]] = []
+        for idx, score in scored[:k]:
+            out.append((self._entries[idx], score))
+        return out
+
     def _embed(self, entry: KnowledgeEntry) -> dict[str, float]:
         """Construye el vector de una entrada uniendo question + tags.
 

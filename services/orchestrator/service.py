@@ -201,25 +201,66 @@ class ChatOrchestrator:
         return self._build_response(request, reply, "rag")
 
     async def _fallback(self, request: schema.ChatRequest, settings=None, compose=None) -> schema.ChatResponse:
-        # Modo "grounded only": no invoca LLM si está habilitado por settings o variable de entorno
+        # 1) Preparar contexto vía RAG top‑k para generar con conocimiento (si existe)
+        contexts: list[str] = []
+        try:
+            thr = float(getattr(settings, "rag_threshold", 0.28)) if settings is not None else 0.28
+        except Exception:
+            thr = 0.28
+        responder = None
+        if self._rag_entries:
+            default_thr = 0.28
+            responder = self._rag_cache.get(default_thr) or SimpleRagResponder(self._rag_entries, threshold=default_thr)
+        if responder is not None:
+            try:
+                top = await responder.topk(request.message, k=3)  # type: ignore[attr-defined]
+                min_score = max(0.0, min(1.0, thr * 0.9))
+                for entry, score in top:
+                    if score >= min_score:
+                        contexts.append(entry.answer)
+            except Exception:
+                pass
+
+        # 2) Modo grounded_only (settings/env)
         grounded_only_env = os.getenv("WEBCHATBOT_GROUNDED_ONLY", "0").lower() not in {"", "0", "false", "no"}
         grounded_only = bool(getattr(settings, "grounded_only", False)) or grounded_only_env
-        if grounded_only:
-            # Abstenerse de inventar si no hubo reglas ni RAG
-            text = (
-                "Por ahora no tengo información precisa sobre esto en nuestros datos. "
-                "Probá con otra frase o escribí 'ayuda' para ver opciones."
+
+        # 3) Construir prompt
+        if contexts:
+            prelude = (
+                "Usá exclusivamente el CONTEXTO provisto para responder. "
+                "Si la respuesta no está en el contexto, indicá que no hay información municipal disponible. "
+                "Respondé de forma breve y clara; usá viñetas si corresponde."
             )
-            return self._build_response(request, text, "fallback")
+            extra = [p.strip() for p in (getattr(settings, "pre_prompts", []) or []) if isinstance(p, str) and p.strip()] if settings is not None else []
+            ctx_blocks = [f"[{i}] {txt}" for i, txt in enumerate(contexts, start=1)]
+            context_text = "\n\n".join(ctx_blocks)
+            user_q = request.message.strip()
+            prompt = (
+                f"{prelude}\n" +
+                ("\n".join(f"- {p}" for p in extra) + "\n\n" if extra else "") +
+                f"CONTEXTO:\n{context_text}\n\n" +
+                f"PREGUNTA:\n{user_q}\n\nRESPUESTA:"
+            )
+        else:
+            if grounded_only:
+                text = (
+                    "Por ahora no tengo información precisa sobre esto en nuestros datos. "
+                    "Probá con otra frase o escribí 'ayuda' para ver opciones."
+                )
+                return self._build_response(request, text, "fallback")
+            prompt = (compose(request.message) if callable(compose) else request.message)
+
+        # 4) Invocar LLM con prompt elegido (con o sin contexto)
         if settings is not None:
             generated = await self._llm.generate(
-                (compose(request.message) if callable(compose) else request.message),
+                prompt,
                 temperature=settings.generation.temperature,
                 top_p=settings.generation.top_p,
                 max_tokens=settings.generation.max_tokens,
             )
         else:
-            generated = await self._llm.generate(request.message)
+            generated = await self._llm.generate(prompt)
         return self._build_response(request, generated, "llm")
 
     def attach_rag(self, rag_responder: RagResponderProtocol) -> None:

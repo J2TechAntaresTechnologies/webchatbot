@@ -134,19 +134,31 @@ def defaults_for(bot_id: str, channel: str | None = None) -> BotSettings:
         )
     # Por defecto (municipal web guiado)
     return BotSettings(
-        generation=GenerationSettings(temperature=0.7, top_p=0.9, max_tokens=256),
+        generation=GenerationSettings(temperature=0.7, top_p=0.9, max_tokens=200),
         features=FeatureToggles(use_rules=True, use_rag=True, use_generic_no_match=False, enable_default_rules=True),
         rag_threshold=0.28,
+        grounded_only=True,
         menu_suggestions=[
-            MenuItem(label="Pagar impuestos", message="¿Cómo pago mis impuestos?"),
-            MenuItem(label="Sacar turno", message="Quiero sacar un turno"),
-            MenuItem(label="Hacer reclamo", message="Quiero hacer un reclamo"),
+            MenuItem(label="Trámites online", message="¿Qué trámites puedo hacer online?"),
+            MenuItem(label="Turnos licencia de conducir", message="Quiero sacar un turno para licencia de conducir"),
+            MenuItem(label="Inscripción de proveedores", message="¿Cómo me inscribo como proveedor municipal?"),
+            MenuItem(label="Punto Violeta", message="¿Qué es el Punto Violeta y dónde está?"),
+            MenuItem(label="Consumos problemáticos", message="Necesito ayuda por consumos problemáticos"),
+            MenuItem(label="Certificado de discapacidad", message="¿Cómo tramito el Certificado de Discapacidad?"),
+            MenuItem(label="Cultura y agenda", message="¿Qué actividades culturales hay este mes?"),
+            MenuItem(label="Turismo", message="¿Qué atractivos turísticos tiene la ciudad?"),
+            MenuItem(label="Ambiente (Villa Más Limpia)", message="¿Cómo es la separación y recolección?"),
+            MenuItem(label="Economía social", message="¿Qué apoyo brinda Economía Social?"),
+            MenuItem(label="Obras privadas", message="¿Cómo son los trámites de obras privadas?"),
+            MenuItem(label="Contacto y emergencias", message="Necesito números de contacto y emergencias"),
             MenuItem(label="Ayuda", message="ayuda"),
         ],
-        pre_prompts=[],
-        no_match_replies=[
-            "No tengo una respuesta exacta para eso. Podés escribir 'ayuda' para ver el menú o reformular en pocas palabras.",
+        pre_prompts=[
+            "Responde con frases cortas y claras; usá viñetas cuando enumeres.",
+            "Preferí fuentes oficiales y mencioná el área responsable cuando aplique.",
+            "Ante emergencias: indicá 911 (Policía), 107 (Hospital), 100 (Bomberos).",
         ],
+        no_match_replies=[],
         no_match_pick="first",
         rules=[],
     )
