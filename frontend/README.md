@@ -35,6 +35,8 @@ Acceso externo (sin DNS)
   - Aplicar temas guardados desde el selector "Tema" (cambia el estilo en el acto).
   - Crear/editar un tema (accent, superficies y colores de texto) y Guardarlo.
   - Actualizar un tema existente o Eliminarlo. El tema `default` es el único que no puede borrarse ni sobrescribirse.
+- Visibilidad de variantes:
+  - En la Configuración de tema podés tildar "Mostrar modo libre (MAR2) en el portal". Si lo destildás, se oculta la tarjeta de MAR2 en la pantalla principal.
 - Persistencia:
   - Los temas se guardan en `localStorage` del navegador bajo la clave `webchatbot_themes` y el tema activo en `webchatbot_active_theme`.
   - El tema activo se aplica automáticamente en todas las vistas (`index.html`, `municipal.html`, `mar2.html`).

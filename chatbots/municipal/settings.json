@@ -34,7 +34,9 @@
   ],
   "no_match_replies": [
     "No tengo una respuesta exacta para eso. Podés escribir 'ayuda' para ver el menú o reformular en pocas palabras.",
-    "no estoy entendiendo que es lo que queres decirme , si escribis \"ayuda\", puedo decirte el menu de opciones"
+    "No estoy entendiendo que es lo que queres decirme , si escribis \"ayuda\", puedo decirte el menu de opciones",
+    "No logro comprender lo que intentas decirme, podrias probar nuevamente?",
+    "No comprendo."
   ],
   "no_match_pick": "random",
   "rules": [

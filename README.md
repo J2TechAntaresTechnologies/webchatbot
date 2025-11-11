@@ -1,10 +1,16 @@
 <img src="docs/antares_technologies_srl_cover.jpeg" alt="Antares Technologies SRL — Cover">
 
-# webchatbot
-
 # Chatbot Municipal Híbrido
 
 Base del proyecto para un chatbot web municipal que combina respuestas fijas con generación vía LLM bajo guardrails.
+
+## Mejoras recientes
+- Portal con editor de Configuración por bot (temperature, top‑p, max tokens, pre‑prompts, menú de sugerencias) y editor dedicado de Reglas.
+- Gestor de temas (light/dark + personalizados) persistidos en `localStorage` y aplicados en todas las vistas.
+- API de settings: `/chatbots/{id}/settings` (GET/PUT) y reset `/chatbots/{id}/settings/reset` (POST) con persistencia en `chatbots/<id>/settings.json`.
+- RAG con soporte JSONC (comentarios `//` y `/* */`) en `knowledge/faqs/municipal_faqs.json` y umbral configurable por bot (`rag_threshold`).
+- Motor de reglas con coincidencia flexible k‑de‑n (min_matches) en reglas por defecto para reducir falsos positivos.
+- Orquestador con pre‑prompts, respuestas genéricas opcionales cuando no hay match y canal MAR2/Free que va directo al LLM.
 
 ## Componentes previstos
 - **Frontend web**: interfaz accesible con chat y streaming (prototipo estático disponible).
@@ -32,6 +38,7 @@ docs/
 - `services/api`: aplicación FastAPI y punto de entrada (`main.py`).
 - `services/orchestrator`: motor de decisiones, clasificación de intents y conectores RAG/LLM.
 - `services/llm_adapter`: stub del cliente LLM.
+- `services/chatbots`: modelos y API de configuración por bot.
 - `knowledge/faqs`: dataset JSON/JSONC para el RAG léxico de ejemplo (admite comentarios; el loader los elimina en runtime).
 - `frontend`: portal estático y clientes que consumen `/chat/message` vía `fetch`.
 - `chatbots/`: variantes de chatbots con metadatos y configuración (p. ej. `chatbots/municipal/config.json`).
@@ -40,15 +47,18 @@ docs/
 
 ## Estado actual
 - Endpoint `/chat/message` expuesto a través de FastAPI y orquestador modular.
-- Clasificador de intents heurístico con rutas a reglas FAQ (custom + default configurables), RAG léxico y fallback (genérico opcional) o LLM.
+- Clasificador de intents heurístico con rutas a Reglas FAQ/Fallback (custom + default), RAG léxico y fallback (genérico opcional) o LLM.
 - Base de conocimiento de ejemplo (`knowledge/faqs/municipal_faqs.json`) usada por el RAG (con soporte de comentarios JSONC).
-- Tests unitarios cubren reglas, RAG, fallback y handoff; `./bin/python -m pytest` ejecuta 7 casos en verde.
+- Tests unitarios cubren reglas, RAG, fallback y handoff; `./bin/python -m pytest` para ejecutar.
 - Frontend con portal y variantes: `frontend/index.html` (Portal de Chatbots), `frontend/municipal.html` (Chatbot Municipal) y `frontend/mar2.html` (MAR2, conversación libre) con integración vía `fetch`.
+- Portal incluye: editor de parámetros (guardar/leer vía API), editor de reglas, ayuda integrada y gestor de temas.
 
 ## Parámetros: Reglas y RAG (cómo funciona)
 - Orden de decisión del orquestador: Reglas (FAQ/Fallback) → RAG → Genérico (si está habilitado y no hubo match) → LLM.
 - Reglas
   - Dos orígenes posibles para trazabilidad: `faq` (respuestas oficiales) y `fallback` (saludos/ayuda/menú, smalltalks). Ambas cortan el flujo si matchean.
+  - Coincidencia: match por subcadena en texto normalizado (minúsculas, sin tildes). El motor por defecto soporta reglas "suaves" k‑de‑n (min_matches) para reducir falsos positivos.
+  - Personalización: desde el Portal se pueden agregar reglas propias (keywords, respuesta, origen, enabled). Las reglas propias se priorizan sobre las por defecto.
   - No existen “reglas RAG”. RAG es una etapa separada de recuperación en base de conocimiento.
 - RAG
   - Toggle `features.use_rag`: activa/desactiva la búsqueda en `knowledge/faqs/municipal_faqs.json` cuando el intent del clasificador es `rag`.
@@ -56,6 +66,20 @@ docs/
   - Si no supera el umbral, continúa el flujo (genérico/LLM).
   - Afinado: mejorar `tags` en el dataset y ajustar el umbral según recall/precisión deseados.
 
+
+## Configuración por bot (settings)
+- Persistencia: `chatbots/<id>/settings.json` (creado/actualizado por la API de settings y el Portal).
+- Campos clave:
+  - `generation`: `temperature`, `top_p`, `max_tokens`.
+  - `features`: `use_rules`, `use_rag`, `enable_default_rules`, `use_generic_no_match` (este último muestra respuestas genéricas opcionales cuando no hay match).
+  - `rag_threshold`: umbral RAG por bot.
+  - `menu_suggestions`: lista de atajos (label + message) visibles en el cliente.
+  - `pre_prompts`: instrucciones que se inyectan antes del mensaje del usuario.
+  - `rules`: reglas personalizadas (enabled, keywords, response, source=faq|fallback).
+
+Valores por defecto:
+- Bot `municipal`: reglas y RAG activados, menú de sugerencias inicial y respuestas genéricas desactivadas.
+- Bot `mar2` (modo libre): reglas y RAG desactivados por defecto; la conversación va directa al LLM.
 
 ## Instalación
 1. Crear/activar entorno virtual (recomendado Python 3.10+). En este repositorio se incluye uno (`bin/python`).
@@ -114,6 +138,16 @@ Probar el endpoint vía cURL (sin frontend):
   - `source` (`str`) origen de la respuesta: `faq`, `rag`, `llm` o `fallback`.
   - `escalated` (`bool`) marca si el mensaje se deriva a un agente humano (true cuando el intent es `handoff`).
 
+## API de configuración (`/chatbots`)
+- GET `/chatbots/{id}/settings?channel=web`
+- PUT `/chatbots/{id}/settings`
+- POST `/chatbots/{id}/settings/reset?channel=web`
+
+Ejemplos rápidos (curl):
+- Obtener settings: `curl -sS "http://127.0.0.1:8000/chatbots/municipal/settings?channel=web" | jq .`
+- Guardar cambios: `curl -sS -X PUT "http://127.0.0.1:8000/chatbots/municipal/settings" -H 'Content-Type: application/json' -d '{"features":{"use_rules":true,"use_rag":true},"rag_threshold":0.28}' | jq .`
+- Resetear defaults: `curl -sS -X POST "http://127.0.0.1:8000/chatbots/municipal/settings/reset?channel=web" | jq .`
+
 ## Acceso externo (sin DNS)
 Para hacer una prueba y permitir acceso desde fuera de tu red, sin registrar un dominio, tenés varias opciones. Elegí la que mejor se ajuste a tu entorno:
 
@@ -153,6 +187,11 @@ Sugerencias de seguridad (incluso en pruebas):
 - No uses `WEBCHATBOT_ALLOWED_ORIGINS="*"` fuera de pruebas rápidas.
 - Considerá habilitar `ufw` y registrar accesos (reverse proxy con logs y rate-limiting si la prueba se extiende).
 
+## Variables de entorno útiles
+- `WEBCHATBOT_ALLOWED_ORIGINS`: lista de orígenes permitidos para CORS (coma‑separados o `*`).
+- `window.WEBCHATBOT_API_BASE_URL` (frontend): define la URL base de la API cuando frontend y backend no comparten host/puerto.
+- LLM: `LLM_MODEL_PATH`, `LLM_MAX_TOKENS`, `LLM_TEMPERATURE`, `LLM_TOP_P`, `LLM_CONTEXT_WINDOW`.
+
 ## Pruebas
 1. Instalar dependencias de desarrollo: `make install-dev` (incluye `pytest` y `pytest-asyncio`).
 2. Ejecutar la suite: `make test` o `./bin/python -m pytest` desde la raíz del repositorio.
@@ -170,6 +209,11 @@ Tip (sin activar el venv): `PYTHONPATH=. ./bin/pytest -q` también ejecuta la su
 4. Opcional: ajustar hiperparámetros mediante variables de entorno (`LLM_MAX_TOKENS`, `LLM_TEMPERATURE`, `LLM_TOP_P`, `LLM_CONTEXT_WINDOW`).
 5. Si tras iniciar la API (`uvicorn services.api.main:app --reload`) el modelo falla al cargar, el orquestador regresará al mensaje placeholder; revisá los logs y la compatibilidad del binario.
 
+## Base de conocimiento (FAQs)
+- Dataset: `knowledge/faqs/municipal_faqs.json` (admite comentarios JSONC: `//` y `/* ... */`).
+- Guías: `knowledge/README.md` y `knowledge/faqs/municipal_faqs.EXPLAIN.md` (cómo editar y buenas prácticas).
+- Mejores resultados con preguntas concisas, respuestas claras y `tags` en minúscula que reflejen conceptos clave.
+
 ## Diagnóstico del host
 - Ejecutá `./bin/python scripts/check_host_readiness.py` para medir recursos, dependencias, puertos y firewall antes de exponer el proyecto públicamente.
 - Agregá `--skip-public-ip` si estás en una red sin salida directa a Internet o preferís evitar consultas externas.
@@ -184,6 +228,8 @@ Revisá `docs/roadmap.md` para un plan con los próximos 10 hitos técnicos.
 - `docs/operacion_configuracion_chatbots.md`: operación, configuración de chatbots y gestión de prompts.
 - `README_ALTERNATIVO.txt`: guía rápida específica para la variante MAR2 (modo libre) con ejemplos de uso por CLI y navegador.
  - `chatbots/README.md`: guía para agregar nuevas variantes de chatbots.
+ - `docs/rules_vs_rag.md`: diferencias, cuándo usar reglas vs RAG.
+ - `docs/visualizacion.md`: ideas de visualización y monitoreo.
 
 ## Guías in‑code (referencia rápida)
 - `services/orchestrator/intent_classifier.py`: uso, parametrización, impacto y presets de intents.
@@ -199,7 +245,6 @@ Revisá `docs/roadmap.md` para un plan con los próximos 10 hitos técnicos.
 - `frontend/portal.js`: endpoints de configuración, `API_BASE_URL` y consejos.
 - `frontend/app.js`: cliente Municipal (channel "web").
 - `frontend/app_mar2.js`: cliente MAR2 (modo libre).
-# webchatbot
 <p align="center">
   <img src="docs/antares_technologies_srl_logo.jpeg" alt="Antares Technologies SRL — Logo">
 </p>

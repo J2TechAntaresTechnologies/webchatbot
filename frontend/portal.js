@@ -6,6 +6,7 @@
   // Claves de almacenamiento y variables CSS admitidas por el gestor de temas
   const THEME_KEY = 'webchatbot_themes';
   const ACTIVE_KEY = 'webchatbot_active_theme';
+  const SHOW_MAR2_KEY = 'webchatbot_show_mar2';
   const VARS = ['--accent', '--accent-strong', '--surface', '--surface-bright', '--text-primary', '--text-secondary', '--font-family', '--font-size'];
   const RESERVED = ['default', 'light', 'dark'];
 
@@ -127,6 +128,19 @@
       '--font-family': document.getElementById('th-font-family'),
       '--font-size': document.getElementById('th-font-size'),
     };
+
+    // Visibilidad del modo libre (MAR2) en el portal
+    const showMar2El = document.getElementById('th-show-mar2');
+    if (showMar2El) {
+      const current = (() => { try { return JSON.parse(localStorage.getItem(SHOW_MAR2_KEY) || 'true'); } catch { return true; } })();
+      showMar2El.checked = current !== false;
+      showMar2El.onchange = () => {
+        const val = !!showMar2El.checked;
+        try { localStorage.setItem(SHOW_MAR2_KEY, JSON.stringify(val)); } catch {}
+        // Refrescar la lista del portal inmediatamente
+        try { loadChatbots().then(renderList); } catch {}
+      };
+    }
 
     const themes = loadThemes();
     listEl.innerHTML = '';
@@ -319,7 +333,11 @@ async function loadChatbots() {
 function renderList(items) {
   const list = document.getElementById('bot-list');
   list.innerHTML = '';
-  if (!Array.isArray(items) || items.length === 0) {
+  // Filtrar visibilidad de MAR2 según preferencia
+  const showMar2 = (() => { try { return JSON.parse(localStorage.getItem('webchatbot_show_mar2') || 'true'); } catch { return true; } })();
+  const data = Array.isArray(items) ? items.filter(b => showMar2 || String(b?.id || '').toLowerCase() !== 'mar2') : [];
+
+  if (!Array.isArray(data) || data.length === 0) {
     const empty = document.createElement('p');
     empty.textContent = 'No hay chatbots registrados.';
     empty.className = 'hint';
@@ -327,7 +345,7 @@ function renderList(items) {
     return;
   }
 
-  for (const bot of items) {
+  for (const bot of data) {
     const card = document.createElement('article');
     card.className = 'message bot';
     const title = document.createElement('h2');

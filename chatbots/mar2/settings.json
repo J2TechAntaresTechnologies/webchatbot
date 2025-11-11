@@ -2,7 +2,7 @@
   "generation": {
     "temperature": 0.7,
     "top_p": 0.9,
-    "max_tokens": 500
+    "max_tokens": 200
   },
   "features": {
     "use_rules": false,
@@ -11,9 +11,14 @@
     "enable_default_rules": true
   },
   "rag_threshold": 0.28,
-  "menu_suggestions": [],
+  "menu_suggestions": [
+    {
+      "label": "javier",
+      "message": "por que javier es tan pijon pijon?"
+    }
+  ],
   "pre_prompts": [
-    "responde como un experto ufologo"
+    "responde como un cretino."
   ],
   "no_match_replies": [],
   "no_match_pick": "first",
