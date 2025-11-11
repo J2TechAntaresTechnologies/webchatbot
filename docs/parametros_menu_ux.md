@@ -34,7 +34,8 @@ Parámetros (Bot: municipal)
 │   ├─ Abrir “Gestor RAG (TXT)” (propuesto)
 │   └─ Botón Reindexar (propuesto)
 ├─ 5) Menú del Portal (chips)
-│   └─ Editor de chips (label + message, orden)
+│   ├─ Editor de chips (label + message, orden)
+│   └─ (btn) Usar chips por defecto
 ├─ 6) Ayuda / Menú del bot (propuesto)
 │   ├─ Plantilla de “ayuda/menu” (texto configurable)
 │   └─ Vista previa (render)
@@ -170,7 +171,8 @@ Parámetros
 
 - Cambiar chips del Portal
   1) Parámetros → Menú del Portal. Agregar/eliminar/ordenar chips.
-  2) Guardar. Ver cambios en la vista municipal.
+  2) (Opcional) “Usar chips por defecto” para restablecer los valores de fábrica.
+  3) Guardar. Ver cambios en la vista municipal.
 
 - (Propuesto) Editar Ayuda/Menu
   1) Parámetros → Ayuda/Menu. Cargar plantilla (texto/markdown simple).
@@ -184,4 +186,3 @@ Parámetros
 - Ciertos ítems (RAG JSON/TXT y Intents) requieren endpoints nuevos para editar desde UI; hoy se manejan por archivos y reinicio.
 - Mantener `tags` de RAG en minúscula y sin tildes; usar stems en reglas.
 - Cambios de KB requieren reiniciar la API para reindexar.
-

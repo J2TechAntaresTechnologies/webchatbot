@@ -744,6 +744,7 @@ async function openSettingsModal(bot) {
   }
 
   const addBtn = document.getElementById('stg-add-suggestion');
+  const suggDefaultBtn = document.getElementById('stg-suggestions-default');
   addBtn.onclick = () => {
     const row = document.createElement('div');
     row.className = 'row';
@@ -760,6 +761,22 @@ async function openSettingsModal(bot) {
     row.appendChild(del);
     list.appendChild(row);
   };
+
+  // Restaurar chips por defecto (menú del Portal)
+  if (suggDefaultBtn) {
+    suggDefaultBtn.onclick = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/chatbots/${encodeURIComponent(bot.id)}/defaults?channel=${encodeURIComponent(bot.channel || '')}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const defs = await res.json();
+        renderSuggestionsEditor(list, Array.isArray(defs.menu_suggestions) ? defs.menu_suggestions : []);
+        setFeedback('Chips restablecidos a los valores por defecto (no olvides Guardar).');
+      } catch (e) {
+        console.error('No se pudieron cargar defaults', e);
+        setFeedback('No se pudieron cargar los chips por defecto.', true);
+      }
+    };
+  }
 
   const addPreBtn = document.getElementById('stg-add-preprompt');
   addPreBtn.onclick = () => {
