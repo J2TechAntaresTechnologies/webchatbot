@@ -152,10 +152,12 @@ Parámetros
 - Cambiar Grounded only (solo datos)
   1) Parámetros → General → marcar “Grounded only”.
   2) Guardar. Efecto: si no hay contexto, el bot se abstiene de invocar LLM.
+  3) (Global) Botón “Cargar defaults (sin guardar)” también restaura grounded_only a su estado de fábrica.
 
 - Ajustar generación (LLM)
   1) Parámetros → Generación. Ajustar temperature/top_p/max_tokens.
   2) `pre_prompts`: agregar líneas de estilo/seguridad o pulsar “Usar pre‑prompts por defecto” para restablecerlos.
+  3) (Global) Botón “Cargar defaults (sin guardar)”: trae todos los valores por defecto a la UI; luego “Guardar” para aplicar.
 
 - Agregar regla rápida
   1) Parámetros → Reglas → “Editar reglas…”.

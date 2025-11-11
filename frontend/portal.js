@@ -702,6 +702,7 @@ async function openSettingsModal(bot) {
   const helpTemplate = document.getElementById('stg-help-template');
   const helpDefaultBtn = document.getElementById('stg-help-default');
   const allowedDomains = document.getElementById('stg-allowed-domains');
+  const loadDefaultsBtn = document.getElementById('settings-load-defaults');
   const genericFieldset = document.getElementById('stg-generic-fieldset');
   const useGeneric = document.getElementById('stg-use-generic');
   const noMatchList = document.getElementById('stg-no-match-list');
@@ -882,6 +883,50 @@ async function openSettingsModal(bot) {
   }
 
   document.getElementById('settings-cancel').onclick = () => showBackdrop(false);
+  
+  // Cargar defaults (sin guardar): rellena todos los campos con los valores por defecto
+  if (loadDefaultsBtn) {
+    loadDefaultsBtn.onclick = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/chatbots/${encodeURIComponent(bot.id)}/defaults?channel=${encodeURIComponent(bot.channel || '')}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const defs = await res.json();
+        // Generación
+        temp.value = defs.generation?.temperature ?? 0.7;
+        topp.value = defs.generation?.top_p ?? 0.9;
+        maxt.value = defs.generation?.max_tokens ?? 256;
+        // Comportamiento
+        useRules.checked = !!(defs.features?.use_rules ?? true);
+        useRag.checked = !!(defs.features?.use_rag ?? true);
+        enableDefaultRules.checked = !!(defs.features?.enable_default_rules ?? true);
+        groundedOnly.checked = !!(defs.grounded_only ?? false);
+        ragThreshold.value = (typeof defs.rag_threshold === 'number' ? defs.rag_threshold : 0.28).toFixed(2);
+        ragThreshold.disabled = !useRag.checked;
+        // Genérico (visible solo municipal)
+        if (bot?.id === 'municipal') {
+          genericFieldset?.removeAttribute('hidden');
+          useGeneric.checked = !!(defs.features?.use_generic_no_match ?? false);
+          renderNoMatchEditor(noMatchList, Array.isArray(defs.no_match_replies) ? defs.no_match_replies : []);
+          if (noMatchPick) noMatchPick.value = defs.no_match_pick === 'random' ? 'random' : 'first';
+        } else {
+          genericFieldset?.setAttribute('hidden', '');
+        }
+        // Menú y pre‑prompts
+        renderSuggestionsEditor(list, Array.isArray(defs.menu_suggestions) ? defs.menu_suggestions : []);
+        renderPrepromptsEditor(preList, Array.isArray(defs.pre_prompts) ? defs.pre_prompts : []);
+        // Reglas
+        currentRules = Array.isArray(defs.rules) ? defs.rules.slice() : [];
+        updateRulesSummary();
+        // Ayuda y dominios
+        if (helpTemplate) helpTemplate.value = defs.help_template || '';
+        if (allowedDomains) allowedDomains.value = Array.isArray(defs.allowed_domains) ? defs.allowed_domains.join(', ') : '';
+        setFeedback('Defaults cargados en la UI (no olvides Guardar para aplicar).');
+      } catch (e) {
+        console.error('No se pudieron cargar defaults', e);
+        setFeedback('No se pudieron cargar los defaults.', true);
+      }
+    };
+  }
   // Cerrar al hacer click fuera del cuadro
   const backdrop = document.getElementById('settings-backdrop');
   backdrop.onclick = (ev) => {

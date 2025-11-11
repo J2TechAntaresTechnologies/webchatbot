@@ -112,6 +112,7 @@
         </form>
         <div class="modal-actions">
           <button id="settings-save" type="button">Guardar</button>
+          <button id="settings-load-defaults" type="button" class="btn-secondary">Cargar defaults (sin guardar)</button>
           <button id="settings-reset" type="button">Restablecer</button>
           <button id="settings-cancel" type="button" class="btn-secondary">Cancelar</button>
         </div>
@@ -154,6 +155,7 @@
             <li><strong>Incluir reglas predefinidas</strong>: evalúa tus reglas primero y luego las default del sistema.</li>
             <li><strong>Solo datos</strong>: si está activado, el bot no invoca el LLM cuando no hay match; responde una abstención y sugiere "ayuda".</li>
             <li><strong>Min matches (Reglas)</strong>: en el editor de reglas podés definir cuántas keywords mínimas deben coincidir (k‑de‑n) para activar la regla.</li>
+            <li><strong>Botones rápidos</strong>: “Usar … por defecto” (restaura un bloque en la UI) y “Cargar defaults (sin guardar)” (rellena todo el modal con valores de fábrica). Luego presioná “Guardar” para aplicar.</li>
           </ul>
           <p><strong>Orden de decisión</strong></p>
           <ul>
