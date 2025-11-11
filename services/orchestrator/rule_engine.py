@@ -118,6 +118,116 @@ DEFAULT_RULES: Sequence[Rule] = (
         ),
         source="fallback",
     ),
+    # Submenús por número
+    Rule(
+        keywords=("1",),
+        response=(
+            "Bienestar y Salud:\n"
+            "- Escribí: amsa | cic | consumos | punto violeta | discapacidad | dengue\n"
+            "Ej.: ‘consumos problemáticos’, ‘punto violeta’, ‘certificado discapacidad’."
+        ),
+        source="fallback",
+    ),
+    Rule(
+        keywords=("2",),
+        response=(
+            "Educación y Juventud:\n"
+            "- Escribí: juventud | deporte | congreso cer | economía social\n"
+            "Ej.: ‘juventud’, ‘deporte’, ‘congreso cer’, ‘economía social’."
+        ),
+        source="fallback",
+    ),
+    Rule(
+        keywords=("3",),
+        response=(
+            "Trámites y Gestiones:\n"
+            "- Escribí: trámite online | turno licencia | proveedores | libre deuda | expedientes\n"
+            "Ej.: ‘trámites online’, ‘turno licencia de conducir’, ‘proveedores’."
+        ),
+        source="fallback",
+    ),
+    Rule(
+        keywords=("4",),
+        response=(
+            "Cultura, Turismo y Ambiente:\n"
+            "- Escribí: agenda cultural | turismo | villa más limpia | residuos\n"
+            "Ej.: ‘agenda cultural’, ‘turismo’, ‘villa más limpia’."
+        ),
+        source="fallback",
+    ),
+    Rule(
+        keywords=("5",),
+        response=(
+            "Desarrollo Urbano y Comercio:\n"
+            "- Escribí: obras privadas | planificación | comercio | habilitaciones\n"
+            "Ej.: ‘obras privadas’, ‘habilitaciones comerciales’."
+        ),
+        source="fallback",
+    ),
+    Rule(
+        keywords=("6",),
+        response=(
+            "Información y Contacto:\n"
+            "- Escribí: contacto | emergencias | horarios\n"
+            "Ej.: ‘emergencias’, ‘horarios de atención’, ‘contacto’."
+        ),
+        source="fallback",
+    ),
+    # Submenús por nombre de categoría (frases completas para evitar interferir con otras reglas)
+    Rule(
+        keywords=("bienestar y salud",),
+        response=(
+            "Bienestar y Salud:\n"
+            "- Escribí: amsa | cic | consumos | punto violeta | discapacidad | dengue\n"
+            "Ej.: ‘consumos problemáticos’, ‘punto violeta’, ‘certificado discapacidad’."
+        ),
+        source="fallback",
+    ),
+    Rule(
+        keywords=("educacion y juventud",),
+        response=(
+            "Educación y Juventud:\n"
+            "- Escribí: juventud | deporte | congreso cer | economía social\n"
+            "Ej.: ‘juventud’, ‘deporte’, ‘congreso cer’, ‘economía social’."
+        ),
+        source="fallback",
+    ),
+    Rule(
+        keywords=("tramites y gestiones",),
+        response=(
+            "Trámites y Gestiones:\n"
+            "- Escribí: trámite online | turno licencia | proveedores | libre deuda | expedientes\n"
+            "Ej.: ‘trámites online’, ‘turno licencia de conducir’, ‘proveedores’."
+        ),
+        source="fallback",
+    ),
+    Rule(
+        keywords=("cultura turismo y ambiente",),
+        response=(
+            "Cultura, Turismo y Ambiente:\n"
+            "- Escribí: agenda cultural | turismo | villa más limpia | residuos\n"
+            "Ej.: ‘agenda cultural’, ‘turismo’, ‘villa más limpia’."
+        ),
+        source="fallback",
+    ),
+    Rule(
+        keywords=("desarrollo urbano y comercio",),
+        response=(
+            "Desarrollo Urbano y Comercio:\n"
+            "- Escribí: obras privadas | planificación | comercio | habilitaciones\n"
+            "Ej.: ‘obras privadas’, ‘habilitaciones comerciales’."
+        ),
+        source="fallback",
+    ),
+    Rule(
+        keywords=("informacion y contacto",),
+        response=(
+            "Información y Contacto:\n"
+            "- Escribí: contacto | emergencias | horarios\n"
+            "Ej.: ‘emergencias’, ‘horarios de atención’, ‘contacto’."
+        ),
+        source="fallback",
+    ),
     # Regla "suave" para consultas sobre trámites y servicios digitales:
     # Usa stems y requiere al menos 2 coincidencias para reducir falsos positivos.
     Rule(

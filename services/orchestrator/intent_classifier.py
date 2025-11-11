@@ -53,6 +53,8 @@ DEFAULT_PATTERNS: Sequence[IntentPattern] = (
     IntentPattern(intent="smalltalk", keywords=("2",), confidence=0.3),
     IntentPattern(intent="smalltalk", keywords=("3",), confidence=0.3),
     IntentPattern(intent="smalltalk", keywords=("4",), confidence=0.3),
+    IntentPattern(intent="smalltalk", keywords=("5",), confidence=0.3),
+    IntentPattern(intent="smalltalk", keywords=("6",), confidence=0.3),
     IntentPattern(intent="handoff", keywords=("hablar", "agente"), confidence=0.8),
     IntentPattern(intent="rag", keywords=("ordenanza",), confidence=0.6),
     IntentPattern(intent="rag", keywords=("normativa",), confidence=0.6),
