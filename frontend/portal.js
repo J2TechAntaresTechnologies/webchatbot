@@ -801,6 +801,23 @@ async function openSettingsModal(bot) {
   useRag.addEventListener('change', () => {
     if (ragThreshold) ragThreshold.disabled = !useRag.checked;
   });
+  
+  // Restaurar dominios permitidos por defecto (sin tocar otros parámetros)
+  if (allowedDefaultBtn && allowedDomains) {
+    allowedDefaultBtn.onclick = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/chatbots/${encodeURIComponent(bot.id)}/defaults?channel=${encodeURIComponent(bot.channel || '')}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const defs = await res.json();
+        const list = Array.isArray(defs.allowed_domains) ? defs.allowed_domains : [];
+        allowedDomains.value = list.join(', ');
+        setFeedback('Dominios permitidos restablecidos (no olvides Guardar).');
+      } catch (e) {
+        console.error('No se pudieron cargar defaults', e);
+        setFeedback('No se pudieron cargar los dominios por defecto.', true);
+      }
+    };
+  }
 
   const addNoMatchBtn = document.getElementById('stg-add-no-match');
   if (addNoMatchBtn) {
