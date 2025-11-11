@@ -18,11 +18,13 @@ Este documento explica las nuevas funcionalidades para generar respuestas usando
 - Portal (frontend): `frontend/index.html` + `frontend/portal.js`
   - Nuevo toggle: “Solo datos (sin LLM si no hay match)”.
   - Editor de reglas con “Min matches”.
+  - Lista blanca de dominios (allowed_domains) para enlaces en respuestas.
 
 ## 3) Activación y defaults
 - Por defecto en Municipal:
   - `use_rules=true`, `use_rag=true`, `grounded_only=true`, `use_generic_no_match=false`.
   - `rag_threshold=0.28`.
+  - `allowed_domains`: `municipio.gob`, `municipio.gob.ar`, `tramites.municipio.gob`, `proveedores.municipio.gob`, `salud.municipio.gob`, `genero.municipio.gob`, `educacion.municipio.gob`, `turismo.municipio.gob`, `cultura.municipio.gob`, `ambiente.municipio.gob`.
 - Portal → Parámetros → Comportamiento → tildar “Solo datos” para este bot.
 - Por entorno (opcional global): `WEBCHATBOT_GROUNDED_ONLY=1`.
 
@@ -99,4 +101,3 @@ Ejemplo (proveedores):
 - Top‑k: `services/orchestrator/rag.py` (método `topk`).
 - Toggle UI: `frontend/index.html` + `frontend/portal.js`.
 - Settings por bot: `services/chatbots/models.py` (campo `grounded_only`).
-

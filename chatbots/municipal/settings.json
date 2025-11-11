@@ -78,6 +78,19 @@
     "No comprendo."
   ],
   "no_match_pick": "random",
+  "allowed_domains": [
+    "municipio.gob",
+    "municipio.gob.ar",
+    "tramites.municipio.gob",
+    "proveedores.municipio.gob",
+    "salud.municipio.gob",
+    "genero.municipio.gob",
+    "educacion.municipio.gob",
+    "turismo.municipio.gob",
+    "cultura.municipio.gob",
+    "ambiente.municipio.gob"
+  ],
+  "help_template": "Menú principal (escribí una frase o palabra clave):\n1) Bienestar y Salud → amsa, cic, consumos, punto violeta, discapacidad, dengue\n2) Educación y Juventud → juventud, deporte, congreso cer, economía social\n3) Trámites y Gestiones → trámite online, turno licencia, proveedores\n4) Cultura, Turismo y Ambiente → agenda cultural, turismo, villa más limpia\n5) Desarrollo Urbano y Comercio → obras privadas, planificación, comercio\n6) Información y Contacto → contacto, emergencias, horarios\nSugerencia: por ejemplo, escribí ‘turno licencia’ o ‘punto violeta’.",
   "rules": [
     {
       "enabled": true,

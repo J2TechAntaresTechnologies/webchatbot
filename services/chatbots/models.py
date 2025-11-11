@@ -70,6 +70,10 @@ class BotSettings(BaseModel):
         default_factory=list,
         description="Lista blanca de dominios válidos para enlaces en respuestas (vacío = permitir todos)",
     )
+    help_template: str = Field(
+        default="",
+        description="Plantilla de ayuda/menu (si está vacía, se usan las reglas por defecto)",
+    )
     menu_suggestions: list[MenuItem] = Field(default_factory=list)
     pre_prompts: list[str] = Field(default_factory=list, description="Instrucciones iniciales a inyectar antes del mensaje del usuario")
     no_match_replies: list[str] = Field(
@@ -94,6 +98,7 @@ class BotSettings(BaseModel):
             rag_threshold=min(max(float(getattr(self, "rag_threshold", 0.28)), 0.0), 1.0),
             grounded_only=bool(getattr(self, "grounded_only", False)),
             allowed_domains=[d.strip() for d in (getattr(self, "allowed_domains", []) or []) if isinstance(d, str) and d.strip()],
+            help_template=str(getattr(self, "help_template", "") or ""),
             menu_suggestions=self.menu_suggestions,
             pre_prompts=[p for p in self.pre_prompts if isinstance(p, str) and p.strip() != ""],
             no_match_replies=[p.strip() for p in (self.no_match_replies or []) if isinstance(p, str) and p.strip() != ""],
@@ -143,6 +148,28 @@ def defaults_for(bot_id: str, channel: str | None = None) -> BotSettings:
         features=FeatureToggles(use_rules=True, use_rag=True, use_generic_no_match=False, enable_default_rules=True),
         rag_threshold=0.28,
         grounded_only=True,
+        allowed_domains=[
+            "municipio.gob",
+            "municipio.gob.ar",
+            "tramites.municipio.gob",
+            "proveedores.municipio.gob",
+            "salud.municipio.gob",
+            "genero.municipio.gob",
+            "educacion.municipio.gob",
+            "turismo.municipio.gob",
+            "cultura.municipio.gob",
+            "ambiente.municipio.gob",
+        ],
+        help_template=(
+            "Menú principal (escribí una frase o palabra clave):\n"
+            "1) Bienestar y Salud → amsa, cic, consumos, punto violeta, discapacidad, dengue\n"
+            "2) Educación y Juventud → juventud, deporte, congreso cer, economía social\n"
+            "3) Trámites y Gestiones → trámite online, turno licencia, proveedores\n"
+            "4) Cultura, Turismo y Ambiente → agenda cultural, turismo, villa más limpia\n"
+            "5) Desarrollo Urbano y Comercio → obras privadas, planificación, comercio\n"
+            "6) Información y Contacto → contacto, emergencias, horarios\n"
+            "Sugerencia: por ejemplo, escribí ‘turno licencia’ o ‘punto violeta’."
+        ),
         menu_suggestions=[
             MenuItem(label="Trámites online", message="¿Qué trámites puedo hacer online?"),
             MenuItem(label="Turnos licencia de conducir", message="Quiero sacar un turno para licencia de conducir"),
