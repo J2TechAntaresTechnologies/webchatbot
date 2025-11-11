@@ -103,9 +103,16 @@ class ChatOrchestrator:
         reply: str,
         source: ResponseSource,
         escalated: bool = False,
+        settings=None,
     ) -> schema.ChatResponse:
         # Sanitizar salida en todos los casos (Reglas/RAG/LLM)
-        clean = _sanitize_llm_output(reply)
+        allowed = []
+        try:
+            if settings is not None:
+                allowed = list(getattr(settings, "allowed_domains", []) or [])
+        except Exception:
+            allowed = []
+        clean = _sanitize_llm_output(reply, allowed)
         return schema.ChatResponse(
             session_id=request.session_id,
             reply=clean,
@@ -124,6 +131,14 @@ class ChatOrchestrator:
             try:
                 custom_rules_data = getattr(settings, "rules", []) or []
                 custom_rules: list[Rule] = []
+                # Plantilla de ayuda/menu configurable
+                try:
+                    help_tpl = str(getattr(settings, "help_template", "") or "").strip()
+                    if help_tpl:
+                        custom_rules.append(Rule(keywords=("ayuda",), response=help_tpl, source="fallback"))
+                        custom_rules.append(Rule(keywords=("menu",), response=help_tpl, source="fallback"))
+                except Exception:
+                    pass
                 for rc in custom_rules_data:
                     # rc puede ser dict o RuleConfig; acceder de forma segura
                     keywords = list(getattr(rc, "keywords", []) or (rc.get("keywords", []) if isinstance(rc, dict) else []))
@@ -175,10 +190,10 @@ class ChatOrchestrator:
                     text = (
                         "No pude comprender tu consulta. Intentá reformularla en pocas palabras o escribí 'ayuda' para ver opciones."
                     )
-                return self._build_response(request, text, "fallback")
+                return self._build_response(request, text, "fallback", settings=settings)
             return None
         reply, source = match
-        return self._build_response(request, reply, source)
+        return self._build_response(request, reply, source, settings=settings)
 
     async def _try_rag(
         self, request: schema.ChatRequest, prediction: IntentPrediction, settings=None
@@ -201,7 +216,7 @@ class ChatOrchestrator:
         reply = await responder.search(request.message)
         if reply is None:
             return None
-        return self._build_response(request, reply, "rag")
+        return self._build_response(request, reply, "rag", settings=settings)
 
     async def _fallback(self, request: schema.ChatRequest, settings=None, compose=None) -> schema.ChatResponse:
         # 1) Preparar contexto vía RAG top‑k para generar con conocimiento (si existe)
@@ -301,7 +316,9 @@ class ChatOrchestrator:
             self.attach_rag(responder)
 
 
-def _sanitize_llm_output(text: str) -> str:
+from urllib.parse import urlparse
+
+def _sanitize_llm_output(text: str, allowed_domains: list[str] | None = None) -> str:
     """Limpia metadatos no deseados de la salida del LLM.
 
     - Elimina bloques de código (``` ... ```), cabeceras tipo "Respuesta:" y
@@ -316,11 +333,17 @@ def _sanitize_llm_output(text: str) -> str:
     # Quitar líneas de encabezado/meta
     drop_patterns = (
         r"^\s*respuesta\s*:.*$",
-        r"^\s*respuesta final\s*:.*$",
+        r"^\s*respuesta\s+final\s*:.*$",
         r"^\s*answer\s*:.*$",
         r"^\s*response\s*:.*$",
-        r"^\s*la respuesta\s+es.*$",
+        r"^\s*la\s+respuesta\s+es.*$",
         r"^\s*explicaci[oó]n.*$",
+        r"^\s*evaluaci[oó]n.*$",
+        r"^\s*comentari[oa]s?\s*:.*$",
+        r"^\s*language\s*:.*$",
+        r"^\s*idioma\s*:.*$",
+        r"^\s*tags?\s*:.*$",
+        r"^\s*c[oó]digo\s*:.*$",
     )
     lines: list[str] = []
     for raw in s.splitlines():
@@ -330,6 +353,24 @@ def _sanitize_llm_output(text: str) -> str:
             continue
         if l.startswith("```"):
             continue
+        # Heurística para líneas claramente de código no cercadas
+        if re.match(r"^(def\s+|class\s+|from\s+\S+\s+import\s+|import\s+\S+)", l):
+            continue
+        # Filtrar URLs fuera de dominios permitidos (si se configuró)
+        if allowed_domains:
+            def _filter_urls(segment: str) -> str:
+                # Reemplaza URLs no permitidas por texto vacío
+                def _repl(m):
+                    url = m.group(0)
+                    try:
+                        netloc = urlparse(url).netloc.lower()
+                        if any(netloc.endswith(d.lower()) for d in allowed_domains):
+                            return url
+                    except Exception:
+                        pass
+                    return ""
+                return re.sub(r"https?://[^\s)]+", _repl, segment)
+            l = _filter_urls(l)
         lines.append(l)
     # Quitar duplicados adyacentes y líneas vacías múltiples
     cleaned: list[str] = []

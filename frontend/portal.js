@@ -699,6 +699,8 @@ async function openSettingsModal(bot) {
   const enableDefaultRules = document.getElementById('stg-enable-default-rules');
   const ragThreshold = document.getElementById('stg-rag-threshold');
   const groundedOnly = document.getElementById('stg-grounded-only');
+  const helpTemplate = document.getElementById('stg-help-template');
+  const allowedDomains = document.getElementById('stg-allowed-domains');
   const genericFieldset = document.getElementById('stg-generic-fieldset');
   const useGeneric = document.getElementById('stg-use-generic');
   const noMatchList = document.getElementById('stg-no-match-list');
@@ -718,6 +720,8 @@ async function openSettingsModal(bot) {
     ragThreshold.disabled = !useRag.checked;
     enableDefaultRules.checked = !!(settings.features?.enable_default_rules ?? true);
     if (groundedOnly) groundedOnly.checked = !!(settings.grounded_only ?? false);
+    if (helpTemplate) helpTemplate.value = settings.help_template || '';
+    if (allowedDomains) allowedDomains.value = Array.isArray(settings.allowed_domains) ? settings.allowed_domains.join(', ') : '';
     if (noMatchPick) {
       noMatchPick.value = settings.no_match_pick === 'random' ? 'random' : 'first';
     }
@@ -846,6 +850,8 @@ async function openSettingsModal(bot) {
       menu_suggestions: collectSuggestions(list),
       pre_prompts: collectPreprompts(preList),
       rules: Array.isArray(currentRules) ? currentRules : [],
+      help_template: helpTemplate ? (helpTemplate.value || '') : '',
+      allowed_domains: allowedDomains ? (allowedDomains.value || '').split(',').map(s => s.trim()).filter(Boolean) : [],
     };
     const genericVisible = genericFieldset && !genericFieldset.hasAttribute('hidden');
     if (genericVisible) {
@@ -875,6 +881,8 @@ async function openSettingsModal(bot) {
       if (groundedOnly) groundedOnly.checked = !!(settings.grounded_only ?? false);
       ragThreshold.value = (typeof settings.rag_threshold === 'number' ? settings.rag_threshold : 0.28).toFixed(2);
       ragThreshold.disabled = !useRag.checked;
+      if (helpTemplate) helpTemplate.value = settings.help_template || '';
+      if (allowedDomains) allowedDomains.value = Array.isArray(settings.allowed_domains) ? settings.allowed_domains.join(', ') : '';
       if (bot?.id === 'municipal') {
         genericFieldset?.removeAttribute('hidden');
         useGeneric.checked = !!(settings.features?.use_generic_no_match ?? false);

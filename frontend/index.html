@@ -48,6 +48,29 @@
             </label>
             <label><input id="stg-grounded-only" type="checkbox" /> Solo datos (sin LLM si no hay match)</label>
           </fieldset>
+          <fieldset>
+            <legend>RAG y Edición</legend>
+            <div>
+              <button id="btn-rag-json" type="button" class="btn-link">Editor RAG (JSON)…</button>
+              <button id="btn-rag-txt" type="button" class="btn-link">Gestor RAG (TXT)…</button>
+              <button id="btn-rag-reindex" type="button">Reindexar</button>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Ayuda/Menu</legend>
+            <label>Plantilla de ayuda/menu
+              <textarea id="stg-help-template" rows="4" placeholder="Texto que se devolverá ante 'ayuda' o 'menu'"></textarea>
+            </label>
+          </fieldset>
+          <fieldset>
+            <legend>Avanzadas</legend>
+            <label>Dominios permitidos (enlaces)
+              <input id="stg-allowed-domains" type="text" placeholder="ej.: municipio.gob, municipio.gob.ar" />
+            </label>
+            <div>
+              <button id="btn-intents" type="button" class="btn-link">Editar Intents…</button>
+            </div>
+          </fieldset>
           <fieldset id="stg-generic-fieldset" hidden>
             <legend>Respuesta genérica (no-match)</legend>
             <label><input id="stg-use-generic" type="checkbox" /> Responder genérico si no hay coincidencia</label>
@@ -213,3 +236,45 @@
     <script defer src="portal.js?v=20251107"></script>
   </body>
 </html>
+    <!-- Modal RAG JSON -->
+    <div id="rag-json-backdrop" class="modal-backdrop" hidden>
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-header"><h2>Editor RAG (JSON)</h2></div>
+        <textarea id="rag-json-editor" style="width:100%;height:50vh" aria-label="RAG JSON"></textarea>
+        <div class="modal-actions">
+          <button id="rag-json-load" type="button">Cargar</button>
+          <button id="rag-json-save" type="button">Guardar</button>
+          <button id="rag-json-close" type="button" class="btn-secondary">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal RAG TXT -->
+    <div id="rag-txt-backdrop" class="modal-backdrop" hidden>
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-header"><h2>Gestor RAG (TXT)</h2></div>
+        <div id="rag-txt-list" class="help-body"></div>
+        <label>Archivo nuevo
+          <input id="rag-txt-name" type="text" placeholder="ej.: mi_texto.txt" />
+        </label>
+        <textarea id="rag-txt-content" style="width:100%;height:30vh" placeholder="Contenido .txt"></textarea>
+        <div class="modal-actions">
+          <button id="rag-txt-upload" type="button">Subir/Guardar</button>
+          <button id="rag-txt-delete" type="button" class="btn-secondary">Eliminar seleccionado</button>
+          <button id="rag-txt-close" type="button" class="btn-secondary">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Intents -->
+    <div id="intents-backdrop" class="modal-backdrop" hidden>
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-header"><h2>Editor de Intents</h2></div>
+        <textarea id="intents-editor" style="width:100%;height:50vh" placeholder='{"patterns": [{"intent":"rag","keywords":["tramit","online"],"confidence":0.65}]}'></textarea>
+        <div class="modal-actions">
+          <button id="intents-load" type="button">Cargar</button>
+          <button id="intents-save" type="button">Guardar</button>
+          <button id="intents-close" type="button" class="btn-secondary">Cerrar</button>
+        </div>
+      </div>
+    </div>

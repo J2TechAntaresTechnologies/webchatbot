@@ -66,6 +66,10 @@ class BotSettings(BaseModel):
             "Si es True, el orquestador no invoca LLM como fallback: responde solo con Reglas y RAG (abstiene si no hay match)."
         ),
     )
+    allowed_domains: list[str] = Field(
+        default_factory=list,
+        description="Lista blanca de dominios válidos para enlaces en respuestas (vacío = permitir todos)",
+    )
     menu_suggestions: list[MenuItem] = Field(default_factory=list)
     pre_prompts: list[str] = Field(default_factory=list, description="Instrucciones iniciales a inyectar antes del mensaje del usuario")
     no_match_replies: list[str] = Field(
@@ -89,6 +93,7 @@ class BotSettings(BaseModel):
             features=self.features,
             rag_threshold=min(max(float(getattr(self, "rag_threshold", 0.28)), 0.0), 1.0),
             grounded_only=bool(getattr(self, "grounded_only", False)),
+            allowed_domains=[d.strip() for d in (getattr(self, "allowed_domains", []) or []) if isinstance(d, str) and d.strip()],
             menu_suggestions=self.menu_suggestions,
             pre_prompts=[p for p in self.pre_prompts if isinstance(p, str) and p.strip() != ""],
             no_match_replies=[p.strip() for p in (self.no_match_replies or []) if isinstance(p, str) and p.strip() != ""],
