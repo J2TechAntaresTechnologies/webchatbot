@@ -48,6 +48,7 @@ import json
 from dataclasses import dataclass
 from math import sqrt
 from pathlib import Path
+import re
 from typing import Iterable, Sequence
 
 from services.orchestrator.text_utils import normalize_text
@@ -189,6 +190,56 @@ def load_default_entries(path: Path | None = None) -> Sequence[KnowledgeEntry]:
                 tags=tuple(str(tag) for tag in item.get("tags", [])),
             )
         )
+    return entries
+
+
+def load_text_dir_entries(text_dir: Path) -> Sequence[KnowledgeEntry]:
+    """Carga entradas de texto desde un directorio plano (.txt) para usarlas como KB.
+
+    Heurística simple:
+    - Recorre archivos *.txt del directorio `text_dir`.
+    - Divide en párrafos por líneas en blanco.
+    - Crea una KnowledgeEntry por párrafo no vacío (≥ 160 caracteres aprox.).
+    - question: primera oración o los primeros ~120 caracteres del párrafo.
+    - answer: el párrafo completo (recortado).
+    - tags: tokens derivados del nombre del archivo (sin extensión).
+
+    Pensado para “munivilladata” y documentos curatoriales. No requiere editar
+    el JSON principal y permite ampliar cobertura sin cambiar estructura.
+    """
+    entries: list[KnowledgeEntry] = []
+    if not text_dir.exists() or not text_dir.is_dir():
+        return entries
+    for path in sorted(text_dir.glob("*.txt")):
+        try:
+            raw = path.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+        # Normalizar saltos y separar por párrafos
+        blocks = [b.strip() for b in re.split(r"\n\s*\n+", raw) if b and b.strip()]
+        # Tags desde el nombre del archivo
+        stem = path.stem.lower()
+        tags = tuple(t for t in re.split(r"[^a-z0-9]+", stem) if t)
+        for i, para in enumerate(blocks):
+            # Filtrar párrafos muy cortos (saludos, cabeceras)
+            if len(para) < 160:
+                continue
+            # Pregunta/encabezado breve para indexar
+            # Tomamos la primera oración o 120 caracteres
+            m = re.split(r"(?<=[\.!?])\s+", para)
+            head = m[0] if m else para
+            question = head.strip()
+            if len(question) > 120:
+                question = question[:117].rstrip() + "…"
+            uid = f"txt-{stem}-{i:03d}"
+            entries.append(
+                KnowledgeEntry(
+                    uid=uid,
+                    question=question,
+                    answer=para.strip(),
+                    tags=tags,
+                )
+            )
     return entries
 
 

@@ -12,7 +12,9 @@ from services.orchestrator.types import (
     RagResponderProtocol,
     ResponseSource,
 )
-from services.orchestrator.rag import SimpleRagResponder, load_default_entries, KnowledgeEntry
+import os
+from services.orchestrator.rag import SimpleRagResponder, load_default_entries, load_text_dir_entries, KnowledgeEntry
+from pathlib import Path
 from services.chatbots.models import load_settings
 
 
@@ -199,6 +201,15 @@ class ChatOrchestrator:
         return self._build_response(request, reply, "rag")
 
     async def _fallback(self, request: schema.ChatRequest, settings=None, compose=None) -> schema.ChatResponse:
+        # Modo "grounded only": no invoca LLM si está habilitado por variable de entorno
+        grounded_only = os.getenv("WEBCHATBOT_GROUNDED_ONLY", "0").lower() not in {"", "0", "false", "no"}
+        if grounded_only:
+            # Abstenerse de inventar si no hubo reglas ni RAG
+            text = (
+                "Por ahora no tengo información precisa sobre esto en nuestros datos. "
+                "Probá con otra frase o escribí 'ayuda' para ver opciones."
+            )
+            return self._build_response(request, text, "fallback")
         if settings is not None:
             generated = await self._llm.generate(
                 (compose(request.message) if callable(compose) else request.message),
@@ -217,9 +228,19 @@ class ChatOrchestrator:
 
     def _bootstrap_rag(self) -> None:
         try:
-            entries = load_default_entries()
+            entries = list(load_default_entries())
         except FileNotFoundError:
-            return
+            entries = []
+        # Ampliar KB con textos curatoriales (munivilladata) si existe
+        try:
+            root = Path(__file__).resolve().parents[2]
+            extra_dir_env = os.getenv("WEBCHATBOT_TEXT_KB_DIR", "").strip()
+            extra_dir = Path(extra_dir_env) if extra_dir_env else (root / "00relevamientos_j2" / "munivilladata")
+            extra_entries = load_text_dir_entries(extra_dir)
+            if extra_entries:
+                entries.extend(extra_entries)
+        except Exception:
+            pass
         if entries:
             # Guardar entradas para construir variantes por threshold
             self._rag_entries = list(entries)

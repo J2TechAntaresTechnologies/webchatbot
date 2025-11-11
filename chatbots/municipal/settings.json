@@ -7,7 +7,7 @@
   "features": {
     "use_rules": true,
     "use_rag": true,
-    "use_generic_no_match": true,
+    "use_generic_no_match": false,
     "enable_default_rules": true
   },
   "rag_threshold": 0.28,
@@ -87,7 +87,6 @@
         "accident",
         "hospital"
       ],
-      "min_matches": 1,
       "response": "Emergencias: Policía 911, Hospital 107, Bomberos 100. Teléfono municipal: 435500.",
       "source": "fallback"
     },
@@ -108,7 +107,6 @@
         "inscrip",
         "compra"
       ],
-      "min_matches": 2,
       "response": "La inscripción de proveedores se realiza en proveedores.municipio.gob o en Atención Vecinal.",
       "source": "faq"
     },
