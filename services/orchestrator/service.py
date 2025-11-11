@@ -15,6 +15,7 @@ from services.orchestrator.types import (
 import os
 from services.orchestrator.rag import SimpleRagResponder, load_default_entries, load_text_dir_entries, KnowledgeEntry
 from pathlib import Path
+import re
 from services.chatbots.models import load_settings
 
 
@@ -230,7 +231,8 @@ class ChatOrchestrator:
             prelude = (
                 "Usá exclusivamente el CONTEXTO provisto para responder. "
                 "Si la respuesta no está en el contexto, indicá que no hay información municipal disponible. "
-                "Respondé de forma breve y clara; usá viñetas si corresponde."
+                "Respondé de forma breve y clara; usá viñetas si corresponde. "
+                "Devolvé solo la respuesta final, sin prefijos (como 'Respuesta:') ni comentarios de evaluación."
             )
             extra = [p.strip() for p in (getattr(settings, "pre_prompts", []) or []) if isinstance(p, str) and p.strip()] if settings is not None else []
             ctx_blocks = [f"[{i}] {txt}" for i, txt in enumerate(contexts, start=1)]
@@ -240,7 +242,7 @@ class ChatOrchestrator:
                 f"{prelude}\n" +
                 ("\n".join(f"- {p}" for p in extra) + "\n\n" if extra else "") +
                 f"CONTEXTO:\n{context_text}\n\n" +
-                f"PREGUNTA:\n{user_q}\n\nRESPUESTA:"
+                f"PREGUNTA:\n{user_q}\n\n"
             )
         else:
             if grounded_only:
@@ -249,7 +251,12 @@ class ChatOrchestrator:
                     "Probá con otra frase o escribí 'ayuda' para ver opciones."
                 )
                 return self._build_response(request, text, "fallback")
-            prompt = (compose(request.message) if callable(compose) else request.message)
+            base = (compose(request.message) if callable(compose) else request.message)
+            prompt = (
+                "Devolvé solo la respuesta final, sin prefijos (como 'Respuesta:') ni comentarios de evaluación. "
+                "Respondé de forma breve y clara; usá viñetas si corresponde.\n\n"
+                f"PREGUNTA:\n{base}\n\n"
+            )
 
         # 4) Invocar LLM con prompt elegido (con o sin contexto)
         if settings is not None:
@@ -261,7 +268,7 @@ class ChatOrchestrator:
             )
         else:
             generated = await self._llm.generate(prompt)
-        return self._build_response(request, generated, "llm")
+        return self._build_response(request, _sanitize_llm_output(generated), "llm")
 
     def attach_rag(self, rag_responder: RagResponderProtocol) -> None:
         """Permite inyectar un componente RAG conforme al protocolo."""
@@ -290,6 +297,54 @@ class ChatOrchestrator:
             responder = SimpleRagResponder(self._rag_entries, threshold=default_thr)
             self._rag_cache[default_thr] = responder
             self.attach_rag(responder)
+
+
+def _sanitize_llm_output(text: str) -> str:
+    """Limpia metadatos no deseados de la salida del LLM.
+
+    - Elimina bloques de código (``` ... ```), cabeceras tipo "Respuesta:" y
+      comentarios evaluativos ("La respuesta es ...").
+    - Colapsa líneas en blanco y quita duplicados adyacentes.
+    """
+    if not isinstance(text, str):
+        return ""
+    s = text
+    # Quitar bloques de código ``` ... ``` (incluye etiquetas como ```python)
+    s = re.sub(r"```[\s\S]*?```", "", s)
+    # Quitar líneas de encabezado/meta
+    drop_patterns = (
+        r"^\s*respuesta\s*:.*$",
+        r"^\s*respuesta final\s*:.*$",
+        r"^\s*answer\s*:.*$",
+        r"^\s*response\s*:.*$",
+        r"^\s*la respuesta\s+es.*$",
+        r"^\s*explicaci[oó]n.*$",
+    )
+    lines: list[str] = []
+    for raw in s.splitlines():
+        l = raw.strip()
+        low = l.lower()
+        if any(re.match(p, low) for p in drop_patterns):
+            continue
+        if l.startswith("```"):
+            continue
+        lines.append(l)
+    # Quitar duplicados adyacentes y líneas vacías múltiples
+    cleaned: list[str] = []
+    prev = None
+    for l in lines:
+        if not l:
+            if cleaned and cleaned[-1] == "":
+                continue
+            cleaned.append("")
+            prev = ""
+            continue
+        if l == prev:
+            continue
+        cleaned.append(l)
+        prev = l
+    out = "\n".join(cleaned).strip()
+    return out
 
 # ================================================================
 # Guía de uso, parametrización e impacto (Orquestador)
