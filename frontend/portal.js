@@ -702,6 +702,7 @@ async function openSettingsModal(bot) {
   const helpTemplate = document.getElementById('stg-help-template');
   const helpDefaultBtn = document.getElementById('stg-help-default');
   const allowedDomains = document.getElementById('stg-allowed-domains');
+  const allowedDefaultBtn = document.getElementById('stg-allowed-default');
   const loadDefaultsBtn = document.getElementById('settings-load-defaults');
   const genericFieldset = document.getElementById('stg-generic-fieldset');
   const useGeneric = document.getElementById('stg-use-generic');

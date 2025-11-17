@@ -217,4 +217,4 @@ Buenas prácticas rápidas
 - Usar genérico para consultas vagas si se quiere evitar LLM.
 - Mantener pre_prompts claros, sin contradicciones, y pocos.
 - Para reglas, usar stems cortos en keywords ("pag", "impuest", "turno").
-
+- Tener en cuenta que, cuando el flujo llega al LLM, la salida se limpia antes de mostrarse: se eliminan encabezados meta ("Respuesta:", "RESPOSTA:"), eco de instrucciones de `pre_prompts` y URLs por fuera de `allowed_domains` (si se configuró). Si aparece un encabezado nuevo indeseado, puede añadirse un patrón extra en `_sanitize_llm_output` (services/orchestrator/service.py).

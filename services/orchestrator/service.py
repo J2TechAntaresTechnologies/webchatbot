@@ -107,12 +107,19 @@ class ChatOrchestrator:
     ) -> schema.ChatResponse:
         # Sanitizar salida en todos los casos (Reglas/RAG/LLM)
         allowed = []
+        pre_prompts: list[str] | None = None
         try:
             if settings is not None:
                 allowed = list(getattr(settings, "allowed_domains", []) or [])
+                pre_prompts = [
+                    p
+                    for p in (getattr(settings, "pre_prompts", []) or [])
+                    if isinstance(p, str) and p.strip()
+                ]
         except Exception:
             allowed = []
-        clean = _sanitize_llm_output(reply, allowed)
+            pre_prompts = None
+        clean = _sanitize_llm_output(reply, allowed, pre_prompts)
         return schema.ChatResponse(
             session_id=request.session_id,
             reply=clean,
@@ -285,7 +292,8 @@ class ChatOrchestrator:
             )
         else:
             generated = await self._llm.generate(prompt)
-        return self._build_response(request, _sanitize_llm_output(generated), "llm")
+        # Sanitización completa (metadatos + posibles fugas de pre_prompts) en _build_response
+        return self._build_response(request, generated, "llm", settings=settings)
 
     def attach_rag(self, rag_responder: RagResponderProtocol) -> None:
         """Permite inyectar un componente RAG conforme al protocolo."""
@@ -318,7 +326,11 @@ class ChatOrchestrator:
 
 from urllib.parse import urlparse
 
-def _sanitize_llm_output(text: str, allowed_domains: list[str] | None = None) -> str:
+def _sanitize_llm_output(
+    text: str,
+    allowed_domains: list[str] | None = None,
+    pre_prompts: list[str] | None = None,
+) -> str:
     """Limpia metadatos no deseados de la salida del LLM.
 
     - Elimina bloques de código (``` ... ```), cabeceras tipo "Respuesta:" y
@@ -328,12 +340,24 @@ def _sanitize_llm_output(text: str, allowed_domains: list[str] | None = None) ->
     if not isinstance(text, str):
         return ""
     s = text
+
+    # Normalizar pre_prompts para poder filtrar líneas que el modelo pueda "repetir"
+    normalized_pre: set[str] = set()
+    if pre_prompts:
+        for p in pre_prompts:
+            if not isinstance(p, str):
+                continue
+            val = p.strip()
+            if val:
+                normalized_pre.add(val.lower())
     # Quitar bloques de código ``` ... ``` (incluye etiquetas como ```python)
     s = re.sub(r"```[\s\S]*?```", "", s)
     # Quitar líneas de encabezado/meta
     drop_patterns = (
         r"^\s*respuesta\s*:.*$",
         r"^\s*respuesta\s+final\s*:.*$",
+        r"^\s*resposta\s*:.*$",
+        r"^\s*resposta\s+final\s*:.*$",
         r"^\s*answer\s*:.*$",
         r"^\s*response\s*:.*$",
         r"^\s*la\s+respuesta\s+es.*$",
@@ -344,6 +368,12 @@ def _sanitize_llm_output(text: str, allowed_domains: list[str] | None = None) ->
         r"^\s*idioma\s*:.*$",
         r"^\s*tags?\s*:.*$",
         r"^\s*c[oó]digo\s*:.*$",
+        r"^\s*segu[ií]\s+estas\s+instrucciones\s+al\s+responder\s*:?.*$",
+        r"^\s*us[aá]\s+exclusivamente\s+el\s+contexto\s+provisto\s+para\s+responder.*$",
+        # Docstrings/comentarios de prueba que el modelo a veces inyecta
+        r"^\s*\"\"\".*$",
+        r"^\s*'''.*$",
+        r"^\s*tests?\s+the\s+response.*$",
     )
     lines: list[str] = []
     for raw in s.splitlines():
@@ -356,6 +386,12 @@ def _sanitize_llm_output(text: str, allowed_domains: list[str] | None = None) ->
         # Heurística para líneas claramente de código no cercadas
         if re.match(r"^(def\s+|class\s+|from\s+\S+\s+import\s+|import\s+\S+)", l):
             continue
+        # Filtrar líneas que son exactamente una instrucción de pre_prompt (con o sin viñeta)
+        if normalized_pre:
+            candidate = low[2:].strip() if low.startswith("- ") else low
+            if candidate in normalized_pre:
+                continue
+
         # Filtrar URLs fuera de dominios permitidos (si se configuró)
         if allowed_domains:
             def _filter_urls(segment: str) -> str:
@@ -424,6 +460,10 @@ def _sanitize_llm_output(text: str, allowed_domains: list[str] | None = None) ->
 # -------------------------
 # - Activar reglas y RAG reduce llamadas al LLM y mejora precisión en dominios cubiertos.
 # - pre_prompts condiciona estilo/rol/políticas del LLM cuando se invoca.
+# - Antes de devolver cualquier texto del LLM, se aplica `_sanitize_llm_output` para:
+#   * quitar encabezados/meta tipo "Respuesta:", "RESPOSTA:", "Answer:", etc.;
+#   * evitar que el modelo "rebote" las instrucciones cargadas en `pre_prompts`;
+#   * filtrar URLs que no pertenezcan a dominios permitidos (`allowed_domains`).
 # - No guarda estado de conversación (stateless). Si necesitás memoria, extender para
 #   recuperar últimos turnos y pasarlos al LLM.
 # - Concurrencia: una única instancia del orquestador se reutiliza; componentes son

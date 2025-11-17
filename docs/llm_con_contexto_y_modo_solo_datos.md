@@ -14,6 +14,7 @@ Este documento explica las nuevas funcionalidades para generar respuestas usando
   - Búsqueda top‑k (nuevo): `SimpleRagResponder.topk()`.
 - Orquestador: `services/orchestrator/service.py`
   - Fallback con contexto: arma un prompt con pasajes relevantes + instrucciones “usar solo contexto”.
+  - Sanitización de salida: borra encabezados tipo “Respuesta:”, “RESPOSTA:”, comentarios meta y repeticiones de `pre_prompts` para evitar fugas de prompt.
   - `grounded_only` (settings/env): si está activo y no hay contexto, se abstiene.
 - Portal (frontend): `frontend/index.html` + `frontend/portal.js`
   - Nuevo toggle: “Solo datos (sin LLM si no hay match)”.
@@ -89,6 +90,7 @@ Ejemplo (proveedores):
 - `grounded_only`:
   - ON: no LLM sin contexto.
   - OFF: LLM sin contexto (se mantiene compose()/pre_prompts) cuando no haya pasajes.
+  - En ambos casos, la salida del LLM se limpia con `_sanitize_llm_output` (sin “Respuesta:”, sin eco de las instrucciones y con filtrado de dominios externos si se configuró `allowed_domains`).
 
 ## 7) Ejemplos de interacción
 - “trámites online” → RAG (JSON) o LLM con contexto (si el top‑k trae pasajes).
@@ -98,6 +100,7 @@ Ejemplo (proveedores):
 
 ## 8) Referencias
 - Fallback con contexto: `services/orchestrator/service.py` (método `_fallback`).
+  - Sanitización y filtrado de meta‑texto/links: función `_sanitize_llm_output`.
 - Top‑k: `services/orchestrator/rag.py` (método `topk`).
 - Toggle UI: `frontend/index.html` + `frontend/portal.js`.
 - Settings por bot: `services/chatbots/models.py` (campo `grounded_only`).

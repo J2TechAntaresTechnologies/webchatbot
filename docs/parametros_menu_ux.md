@@ -105,6 +105,7 @@ Parámetros (Bot: municipal)
 
 - Avanzadas / Sistema
   - Variables globales via env: `LLM_MODEL_PATH`, `WEBCHATBOT_TEXT_KB_DIR`, `WEBCHATBOT_GROUNDED_ONLY`.
+  - Sanitización de salida del LLM: la capa de orquestación elimina encabezados tipo “Respuesta:”/“RESPOSTA:”, eco de instrucciones (`pre_prompts`) y URLs fuera de `allowed_domains` antes de enviar la respuesta al usuario.
 
 ## Diagrama de navegación (ASCII)
 
@@ -190,3 +191,4 @@ Parámetros
 - Ciertos ítems (RAG JSON/TXT y Intents) requieren endpoints nuevos para editar desde UI; hoy se manejan por archivos y reinicio.
 - Mantener `tags` de RAG en minúscula y sin tildes; usar stems en reglas.
 - Cambios de KB requieren reiniciar la API para reindexar.
+- Si el LLM devuelve meta‑texto (por ejemplo “Respuesta:” o repite instrucciones de estilo), `_sanitize_llm_output` lo filtra automáticamente; si se observan nuevos patrones indeseados, se agregan como regex adicionales en `services/orchestrator/service.py`.
